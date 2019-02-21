@@ -57,7 +57,8 @@ typedef float				fpshort;
 #include "AE_GeneralPlug.h"
 #include "AEFX_ChannelDepthTpl.h"
 #include "AEGP_SuiteHandler.h"
-
+#include <random>
+#include <ctime>
 #include "GLator_Strings.h"
 
 
@@ -72,24 +73,95 @@ typedef float				fpshort;
 
 /* Parameter defaults */
 
-#define	GLATOR_SLIDER_MIN		0
-#define	GLATOR_SLIDER_MAX		100
-#define	GLATOR_SLIDER_DFLT		50
 
-enum {
-	GLATOR_INPUT = 0,
-	GLATOR_SLIDER,
-	GLATOR_POPUP,
-	GLATOR_TOPIC_1,
-	GLATOR_TOPIC_2,
-	GLATOR_NUM_PARAMS
-};
+/* Parameter defaults */
 
-enum {
-	SLIDER_DISK_ID = 1
-};
+#define POPUP_OPT	7
 
 
+std::ranlux48 gen;
+std::uniform_int_distribution<int> uniform_0_255_red(0, 255);
+std::uniform_int_distribution<int> uniform_0_255_green(0, 255);
+std::uniform_int_distribution<int> uniform_0_255_blue(0, 255);
+std::uniform_int_distribution<int> uniform_0_100_hue(0, 100);
+std::uniform_int_distribution<int> uniform_0_100_saturation(0, 100);
+std::uniform_int_distribution<int> uniform_0_100_luminance(0, 100);
+
+const int RED_DEF = uniform_0_255_red(time());
+const int GREEN_DEF = uniform_0_255_green(time()*time());
+const int BLUE_DEF = uniform_0_255_blue(time() + time());
+
+#define HSL_SLIDER_VALID_MIN	0
+#define HSL_SLIDER_VALID_MAX	100
+#define HSL_SLIDER_MIN	0
+#define HSL_SLIDER_MAX	100
+
+const int HUE_DEF = uniform_0_100_hue(time());
+const int SAT_DEF = uniform_0_100_saturation(time()*time());
+const int LUM_DEF = uniform_0_100_luminance(time() + time());
+
+
+#define SHADE_SLIDER_VALID_MIN	1
+#define SHADE_SLIDER_VALID_MAX	10
+#define SHADE_SLIDER_MIN	1
+#define SHADE_SLIDER_MAX	10
+
+#define SHADE_1_DEF		2
+#define SHADE_2_DEF		 5
+#define SHADE_3_DEF		8
+#define SHADE_4_DEF		10
+
+
+#define DEN_SLIDER_VALID_MIN	1
+#define DEN_SLIDER_VALID_MAX	3
+#define DEN_SLIDER_MIN	1
+#define DEN_SLIDER_MAX	3
+
+#define DEN_1_DEF		1
+#define DEN_2_DEF		 1
+#define DEN_3_DEF		1
+
+
+	enum {
+		RANG_INPUT = 0,
+		RANG_TOPIC_COLOR_ID,
+		RANG_POPUP_ID,
+		RANG_COLOR_ID,
+		RANG_HUE_ID,
+		RANG_SATURATION_ID,
+		RANG_LUMINANCE_ID,
+		RANG_TOPIC_SHADE_ID,
+		RANG_SHADE_1_ID,
+		RANG_SHADE_2_ID,
+		RANG_SHADE_3_ID,
+		RANG_SHADE_4_ID,
+		RANG_TOPIC_DEN_ID,
+		RANG_DEN_1_ID,
+		RANG_DEN_2_ID,
+		RANG_DEN_3_ID,
+		RANG_NUM_PARAMS
+	};
+
+
+
+	enum {
+		SLIDER_DISK_ID = 0,
+		RANG_TOPIC_COLOR_PARAM,
+		RANG_POPUP_PARAM,
+		RANG_COLOR_PARAM,
+		RANG_HUE_PARAM,
+		RANG_SATURATION_PARAM,
+		RANG_LUMINANCE_PARAM,
+		RANG_TOPIC_SHADE_PARAM,
+		RANG_SHADE_1_PARAM,
+		RANG_SHADE_2_PARAM,
+		RANG_SHADE_3_PARAM,
+		RANG_SHADE_4_PARAM,
+		RANG_TOPIC_DEN_PARAM,
+		RANG_DEN_1_PARAM,
+		RANG_DEN_2_PARAM,
+		RANG_DEN_3_PARAM
+	};
 extern "C" {
 	
 	DllExport

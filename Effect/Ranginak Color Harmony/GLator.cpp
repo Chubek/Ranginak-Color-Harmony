@@ -516,8 +516,6 @@ ParamsSetup (
 
 	AEFX_CLR_STRUCT(def);
 
-	PF_ADD_TOPIC("Topic1", GLATOR_TOPIC_1);
-
 	PF_ADD_SLIDER(	STR(StrID_Name), 
 					GLATOR_SLIDER_MIN, 
 					GLATOR_SLIDER_MAX, 
@@ -525,9 +523,6 @@ ParamsSetup (
 					GLATOR_SLIDER_MAX, 
 					GLATOR_SLIDER_DFLT,
 					SLIDER_DISK_ID);
-	PF_END_TOPIC(GLATOR_TOPIC_1);
-	PF_ADD_POPUPX("PopUP", 3, 1, ("1 | 2 | 3"), 1, GLATOR_POPUP);
-
 
 	out_data->num_params = GLATOR_NUM_PARAMS;
 
