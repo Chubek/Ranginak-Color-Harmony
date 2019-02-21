@@ -79,6 +79,9 @@ typedef float				fpshort;
 enum {
 	GLATOR_INPUT = 0,
 	GLATOR_SLIDER,
+	GLATOR_POPUP,
+	GLATOR_TOPIC_1,
+	GLATOR_TOPIC_2,
 	GLATOR_NUM_PARAMS
 };
 
