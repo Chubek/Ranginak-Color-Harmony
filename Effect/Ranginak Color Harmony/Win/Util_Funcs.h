@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 
-namespace utils
+namespace cColorUtils
 {
 
 	using color_type = std::vector<float>;
@@ -150,5 +150,7 @@ namespace utils
 	{
 		return { color[0], color[1], SLClamp(color[2] * factor) };
 	}
+
+
 }
 
