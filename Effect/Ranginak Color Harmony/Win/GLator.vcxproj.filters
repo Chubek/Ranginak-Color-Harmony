@@ -123,6 +123,9 @@
     <ClInclude Include="..\..\..\Headers\AE_PluginData.h">
       <Filter>Headers\AE</Filter>
     </ClInclude>
+    <ClInclude Include="Util_Funcs.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Util\AEGP_SuiteHandler.cpp">

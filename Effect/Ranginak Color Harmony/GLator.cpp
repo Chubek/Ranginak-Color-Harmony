@@ -653,12 +653,14 @@ SmartRender(
 	PF_ParamDef slider_param;
 	AEFX_CLR_STRUCT(slider_param);
 
-	ERR(PF_CHECKOUT_PARAM(in_data,
+	/*ERR(PF_CHECKOUT_PARAM(in_data,
 		1,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
-		&slider_param));
+		&slider_param));*/
+
+	
 
 	if (!err){
 		sliderVal = slider_param.u.fd.value / 100.0f;
@@ -848,3 +850,6 @@ EffectMain(
 	}
 	return err;
 }
+
+
+
