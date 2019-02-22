@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 
-namespace cColorUtils
+namespace ColorUtils
 {
 
 	using color_type = std::vector<float>;
