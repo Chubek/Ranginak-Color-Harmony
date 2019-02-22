@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 
-namespace utils 
+namespace utils
 {
 
 	using color_type = std::vector<float>;
@@ -27,14 +27,24 @@ namespace utils
 			return m1;
 	}
 
-	float UnitCircleClamp(float hue)
+	float HueClamp(float hue)
 	{
 		return (hue > 360) ? hue - 360 : hue;
 	}
 
+	float SLClamp(float value)
+	{
+
+		value = (value > 1.0) ? value = 1.0 : value;
+		value = (value < 0.01) ? value = 0.01 : value;
+
+		return value;
+
+	}
+
 	color_type HSL2RGB(float H, float S, float L)
 	{
-		H = UnitCircleClamp(H) / 360;
+		H = HueClamp(H) / 360;
 		float m1, m2;
 		if (L <= 0.5)
 		{
@@ -84,40 +94,7 @@ namespace utils
 		return { H * 360, S, L };
 	}
 
-	float Clamp(float value)
-	{
 
-		value = (value > 1.0) ? value = 1.0 : value;
-		value = (value < 0.01) ? value = 0.01 : value;
-
-		return value;
-
-	}
-
-	color_type DecreaseSL(color_type color, float factor)
-	{
-		color_type result;
-
-		int sign = std::abs(factor) / factor;
-
-		result[0] = color[0];
-		result[1] = Clamp((color[1] > sign * factor) ? color[1] + factor : color[1]);
-		result[2] = Clamp((color[2] > sign * factor * 0.5) ? color[2] + factor * 0.5 : color[2]);
-
-		return result;
-	}
-
-	std::vector<color_type> GenerateShade(color_type color)
-	{
-		std::vector<color_type> result;
-
-		result[0] = DecreaseSL(color, -0.3);
-		result[1] = DecreaseSL(color, -0.2);
-		result[3] = DecreaseSL(color, 0.2);
-		result[4] = DecreaseSL(color, 0.3);
-
-		return result;
-	}
 
 	color_type HueShift(color_type color, float delta)
 	{
@@ -129,14 +106,49 @@ namespace utils
 		return HueShift(color, 180);
 	}
 
-	std::vector<color_type> Analogous)float angle)
+	std::vector<color_type> Analogous(color_type color, float angle)
 	{
 	return { HueShift(color, angle), HueShift(color, 360 - angle) };
 	}
 
-	std::vecor<color_type> Triadic(color_type color)
+	std::vector<color_type> Triadic(color_type color)
 	{
 		return Analogous(color, 120)
+	}
+	
+	std::vector<color_type> SplitComplementary(color_type color, float angle)
+	{
+		return Analogous(color, 180 - angle);
+	}
+
+	std::vector<color_type> Rectangle(color_type color)
+	{
+		return { HueShift(color, 60), HueShift(color, 180),  HueShift(color, 120)};
+	}
+
+	std::vector<color_type> Square(color_type color)
+	{
+		return { HueShift(color, 90), HueShift(color, 180), HueShift(color, -90) };
+	}
+
+	color_type DesaturateTo(color_type color, float saturation)
+	{
+		return { color[0], saturation, color[2] };
+	}
+
+	color_type DesaturateBy(color_type color, float factor)
+	{
+		return { color[0], SLClamp(color[1] * factor), color[2] };
+	}
+
+	color_type LightenTo(color_type color, float lightness)
+	{
+		return { color[0], color[1], lightness };
+	}
+
+	color_type LightenBy(color_type color, float factor)
+	{
+		return { color[0], color[1], SLClamp(color[2] * factor) };
 	}
 }
 
