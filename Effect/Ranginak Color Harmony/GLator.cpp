@@ -48,6 +48,7 @@
 #include <mutex>
 #include "vmath.hpp"
 #include <assert.h>
+#include <string>
 
 using namespace AESDK_OpenGL;
 using namespace gl33core;
@@ -505,24 +506,53 @@ GlobalSetup (
 }
 
 static PF_Err 
-ParamsSetup (	
+ParamsSetup(
 	PF_InData		*in_data,
 	PF_OutData		*out_data,
 	PF_ParamDef		*params[],
-	PF_LayerDef		*output )
+	PF_LayerDef		*output)
 {
-	PF_Err		err		= PF_Err_NONE;
-	PF_ParamDef	def;	
+	PF_Err		err = PF_Err_NONE;
+	PF_ParamDef	def;
 
 	AEFX_CLR_STRUCT(def);
 
-	PF_ADD_SLIDER(	STR(StrID_Name), 
-					GLATOR_SLIDER_MIN, 
-					GLATOR_SLIDER_MAX, 
-					GLATOR_SLIDER_MIN, 
-					GLATOR_SLIDER_MAX, 
-					GLATOR_SLIDER_DFLT,
-					SLIDER_DISK_ID);
+	PF_ADD_TOPIC(STR(StrID_Color_Topic_Name), RANG_TOPIC_COLOR_ID_START);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_POPUP(STR(StrID_Popup_Name), 7, 1, ("Monochromatic Shade | Complementary | Analogous | Triadic | Split-Complementary | Rectangle | Square"), RANG_POPUP_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_COLOR(STR(StrID_Color_Name), COLOR_RED_DFLT, COLOR_GREEN_DFLT, COLOR_BLUE_DFLT, RANG_COLOR_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_END_TOPIC(RANG_TOPIC_COLOR_ID_END);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_TOPIC(STR(StrID_Shade_Topic_Name), RANG_TOPIC_SHADE_ID_START);
+
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shader_1_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS,  0, 0, RANG_SHADE_1_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shader_2_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_2_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shader_3_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_3_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shader_4_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_4_ID);
+
+	PF_END_TOPIC(RANG_TOPIC_SHADE_ID_END);
+
+
+	PF_ADD_TOPIC(STR(StrID_Den_Topic_Name), RANG_TOPIC_DEN_ID_START);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Den_1_Name), DEN_MIN_VALID, DEN_MAX_VALID, DEN_MIN, DEN_MAX, DEN_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_DEN_1_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Den_2_Name), DEN_MIN_VALID, DEN_MAX_VALID, DEN_MIN, DEN_MAX, DEN_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_DEN_2_ID);
+	AEFX_CLR_STRUCT(def);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Den_3_Name), DEN_MIN_VALID, DEN_MAX_VALID, DEN_MIN, DEN_MAX, DEN_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_DEN_3_ID);
+	AEFX_CLR_STRUCT(def);
+
+
+	PF_END_TOPIC(RANG_TOPIC_DEN_ID_END);
+
+
+
+
 
 	out_data->num_params = GLATOR_NUM_PARAMS;
 
@@ -584,14 +614,7 @@ PreRender(
 	PF_RenderRequest req = extra->input->output_request;
 	PF_CheckoutResult in_result;
 
-	AEFX_CLR_STRUCT(slider_param);
-
-	ERR(PF_CHECKOUT_PARAM(in_data,
-		GLATOR_SLIDER,
-		in_data->current_time,
-		in_data->time_step,
-		in_data->time_scale,
-		&slider_param));
+	//AEFX_CLR_STRUCT(slider_param);
 
 	ERR(extra->cb->checkout_layer(in_data->effect_ref,
 		GLATOR_INPUT,
@@ -606,7 +629,7 @@ PreRender(
 		UnionLRect(&in_result.result_rect, &extra->output->result_rect);
 		UnionLRect(&in_result.max_result_rect, &extra->output->max_result_rect);
 	}
-	ERR2(PF_CHECKIN_PARAM(in_data, &slider_param));
+	//ERR2(PF_CHECKIN_PARAM(in_data, &slider_param));
 	return err;
 }
 
@@ -631,7 +654,7 @@ SmartRender(
 	AEFX_CLR_STRUCT(slider_param);
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
-		GLATOR_SLIDER,
+		1,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
