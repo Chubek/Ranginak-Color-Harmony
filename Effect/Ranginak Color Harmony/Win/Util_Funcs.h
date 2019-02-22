@@ -101,10 +101,10 @@ std::vector<std::vector<float>> GenerateShade(std::vector<float> color)
 {
 	std::vector<std::vector<float>> result;
 
-	result[0] = DecreaseSL(color, -0.6);
+	result[0] = DecreaseSL(color, -0.3);
 	result[1] = DecreaseSL(color, -0.2);
 	result[3] = DecreaseSL(color, 0.2);
-	result[4] = DecreaseSL(color, 0.6);
+	result[4] = DecreaseSL(color, 0.3);
 
 	return result;
 }
