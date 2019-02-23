@@ -151,6 +151,44 @@ namespace ColorUtils
 		return { color[0], color[1], SLClamp(color[2] * factor) };
 	}
 
+	color_type ShadeTo(color_type color, float i, float n)
+	{
+		return LightenTo(color, color[2] - (color[2]) / n * i);
+	}
 
+	color_type TintTo(color_type color, float r)
+	{
+		return LightenTo(color, color[2] + (1 - color[2]) * r);
+	}
+
+	color_type ToneTo(color_type color, float r)
+	{
+		return LightenTo(color, color[2] - color[2] * r);
+	}
+
+	color_type SaturateTo(color_type color, float r)
+	{
+		return DesaturateTo(color, r);
+	}
+
+	color_type ShadeBy(color_type color, float i, float n)
+	{
+		return LightenBy(color, color[2] - (color[2]) / n * i);
+	}
+
+	color_type TintBy(color_type color, float r)
+	{
+		return LightenBy(color, color[2] + (1 - color[2]) * r);
+	}
+
+	color_type ByneBy(color_type color, float r)
+	{
+		return LightenBy(color, color[2] - color[2] * r);
+	}
+
+	color_type SaturateBy(color_type color, float r)
+	{
+		return DesaturateBy(color, r);
+	}
 }
 

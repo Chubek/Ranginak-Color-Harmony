@@ -75,6 +75,11 @@ namespace AESDK_OpenGL
 				{
 					std::cout << " -> " << call.returnValue->asString();
 				}
+
+
+				glEnable(GL_BLEND);
+
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				
 				std::cout << std::endl;
 			});
@@ -517,6 +522,7 @@ void AESDK_OpenGL_Startup(AESDK_OpenGL_EffectCommonData& inData, const AESDK_Ope
 	InitializeOpenGLBindings();
 	
 	inData.mExtensions = glbinding::ContextInfo::extensions();
+
 }
 
 /*
