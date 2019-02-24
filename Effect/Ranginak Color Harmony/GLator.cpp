@@ -1034,13 +1034,24 @@ SmartRender(
 				ColorUtils::color_HSL complentary_4 = HSL_Colors["Main Color"];
 
 				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_2, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_4, sat_1_val);
+				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
 
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_1, shade_2_val);
+				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
 				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_3, tone_2_val);
+				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_3, tint_1_val);
+				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_4, tint_2_val);
+				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_4, tone_2_val);
 				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
 			}
 			
