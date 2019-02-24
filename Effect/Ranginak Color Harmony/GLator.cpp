@@ -49,7 +49,7 @@
 #include "vmath.hpp"
 #include <assert.h>
 #include <string>
-
+#include <vector>
 using namespace AESDK_OpenGL;
 using namespace gl33core;
 
@@ -533,19 +533,19 @@ ParamsSetup(
 	AEFX_CLR_STRUCT(def);
 	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TONE_1_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SAT_1_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Factor_Name), SAT_MIN_VALID, SAT_MAX_VALID, SAT_MIN, SAT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SAT_1_ID);
 
 	PF_END_TOPIC(RANG_TOPIC_VARIANT_FACTOR_ID_END);
 
 	PF_ADD_TOPIC(STR(StrID_Variant_Substitute_Topic_Name), RANG_TOPIC_VARIANT_SUB_ID_START);
 
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Substitute_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_2_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Substitute_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TINT_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TINT_2_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Substitute_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TONE_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TONE_2_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Substitute_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SAT_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Substitute_Name), SAT_FACT_MIN_VALID, SAT_FACT_MAX_VALID, SAT_FACT_MIN, SAT_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SAT_2_ID);
 
 	PF_END_TOPIC(RANG_TOPIC_VARIANT_SUB_ID_END);
 	AEFX_CLR_STRUCT(def);
@@ -617,12 +617,110 @@ PreRender(
 	PF_Err	err = PF_Err_NONE,
 			err2 = PF_Err_NONE;
 
-	PF_ParamDef slider_param;
+	PF_ParamDef popup_param;
+	PF_ParamDef	color_param;
+	PF_ParamDef	shade_1_param;
+	PF_ParamDef	tint_1_param;
+	PF_ParamDef	tone_1_param;
+	PF_ParamDef sat_1_param;
+	PF_ParamDef	shade_2_param;
+	PF_ParamDef	tint_2_param;
+	PF_ParamDef	tone_2_param;
+	PF_ParamDef sat_2_param;
+	PF_ParamDef angle_param;
+	PF_ParamDef	factor_param;
 
 	PF_RenderRequest req = extra->input->output_request;
 	PF_CheckoutResult in_result;
 
-	//AEFX_CLR_STRUCT(slider_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_POPUP_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&popup_param));
+	AEFX_CLR_STRUCT(popup_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_COLOR_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&color_param));
+	AEFX_CLR_STRUCT(color_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SHADE_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&shade_1_param));
+	AEFX_CLR_STRUCT(shade_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TINT_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tint_1_param));
+	AEFX_CLR_STRUCT(tint_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TONE_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tone_1_param));
+	AEFX_CLR_STRUCT(tone_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SAT_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&sat_1_param));
+	AEFX_CLR_STRUCT(sat_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SHADE_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&shade_2_param));
+	AEFX_CLR_STRUCT(shade_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TINT_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tint_2_param));
+	AEFX_CLR_STRUCT(tint_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TONE_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tone_2_param));
+	AEFX_CLR_STRUCT(tone_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SAT_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&sat_2_param));
+	AEFX_CLR_STRUCT(sat_1_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_GRAD_ANGLE_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&angle_param));
+	AEFX_CLR_STRUCT(angle_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_BLEND_FACTOR_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&factor_param));
+	AEFX_CLR_STRUCT(factor_param);
 
 	ERR(extra->cb->checkout_layer(in_data->effect_ref,
 		GLATOR_INPUT,
@@ -637,7 +735,18 @@ PreRender(
 		UnionLRect(&in_result.result_rect, &extra->output->result_rect);
 		UnionLRect(&in_result.max_result_rect, &extra->output->max_result_rect);
 	}
-	//ERR2(PF_CHECKIN_PARAM(in_data, &slider_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &popup_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &color_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &shade_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tint_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tone_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &sat_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &shade_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tint_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tone_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &sat_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &angle_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &factor_param));
 	return err;
 }
 
@@ -658,20 +767,133 @@ SmartRender(
 
 	AEGP_SuiteHandler suites(in_data->pica_basicP);
 
-	PF_ParamDef slider_param;
-	AEFX_CLR_STRUCT(slider_param);
+	PF_ParamDef popup_param;
+	PF_ParamDef	color_param;
+	PF_ParamDef	shade_1_param;
+	PF_ParamDef	tint_1_param;
+	PF_ParamDef	tone_1_param;
+	PF_ParamDef sat_1_param;
+	PF_ParamDef	shade_2_param;
+	PF_ParamDef	tint_2_param;
+	PF_ParamDef	tone_2_param;
+	PF_ParamDef sat_2_param;
+	PF_ParamDef angle_param;
+	PF_ParamDef	factor_param;
 
-	/*ERR(PF_CHECKOUT_PARAM(in_data,
-		1,
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_POPUP_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
-		&slider_param));*/
+		&popup_param));
+	AEFX_CLR_STRUCT(popup_param);
 
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_COLOR_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&color_param));
+	AEFX_CLR_STRUCT(color_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SHADE_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&shade_1_param));
+	AEFX_CLR_STRUCT(shade_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TINT_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tint_1_param));
+	AEFX_CLR_STRUCT(tint_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TONE_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tone_1_param));
+	AEFX_CLR_STRUCT(tone_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SAT_1_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&sat_1_param));
+	AEFX_CLR_STRUCT(sat_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SHADE_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&shade_2_param));
+	AEFX_CLR_STRUCT(shade_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TINT_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tint_2_param));
+	AEFX_CLR_STRUCT(tint_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_TONE_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&tone_2_param));
+	AEFX_CLR_STRUCT(tone_1_param);
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_SAT_2_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&sat_2_param));
+	AEFX_CLR_STRUCT(sat_1_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_GRAD_ANGLE_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&angle_param));
+	AEFX_CLR_STRUCT(angle_param);
+
+	ERR(PF_CHECKOUT_PARAM(in_data,
+		RANG_BLEND_FACTOR_PARAM,
+		in_data->current_time,
+		in_data->time_step,
+		in_data->time_scale,
+		&factor_param));
+	AEFX_CLR_STRUCT(factor_param);
 	
+	PF_FpLong	popup_val;
+	PF_PixelFloat	color_val;
+	PF_FpLong	shade_1_val;
+	PF_FpLong	tint_1_val;
+	PF_FpLong	tone_1_val;
+	PF_FpLong	sat_1_val;
+	PF_FpLong	shade_2_val;
+	PF_FpLong	tint_2_val;
+	PF_FpLong	tone_2_val;
+	PF_FpLong	sat_2_val;
+	PF_Fixed	angle_val;
+	PF_FpLong	factor_val;
 
 	if (!err){
-		sliderVal = slider_param.u.fd.value / 100.0f;
+		//sliderVal = slider_param.u.fd.value / 100.0f;
+		popup_val = popup_param.u.pd.value;
+		suites.ColorParamSuite1()->PF_GetFloatingPointColorFromColorDef(in_data->effect_ref, &color_param, &color_val);
+		shade_1_val = shade_1_param.u.fs_d.value / 10.0f;
+		tint_1_val = tint_1_param.u.fs_d.value / 10.0f;
+		tone_1_val = tone_1_param.u.fs_d.value / 10.0f;
+		sat_1_val = sat_1_param.u.fs_d.value / 10.0f;
+		shade_2_val = shade_2_param.u.fs_d.value / 100.0f;
+		tint_2_val = shade_2_param.u.fs_d.value / 100.0f;
+		tone_2_val = shade_2_param.u.fs_d.value / 100.0f;
+		sat_2_val = shade_2_param.u.fs_d.value / 100.0f;
 	}
 
 	ERR((extra->cb->checkout_layer_pixels(in_data->effect_ref, GLATOR_INPUT, &input_worldP)));
@@ -774,7 +996,18 @@ SmartRender(
 		kPFWorldSuite,
 		kPFWorldSuiteVersion2,
 		"Couldn't release suite."));
-	ERR2(PF_CHECKIN_PARAM(in_data, &slider_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &popup_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &color_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &shade_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tint_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tone_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &sat_1_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &shade_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tint_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &tone_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &sat_2_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &angle_param));
+	ERR2(PF_CHECKIN_PARAM(in_data, &factor_param));
 	ERR2(extra->cb->checkin_layer_pixels(in_data->effect_ref, GLATOR_INPUT));
 
 	return err;

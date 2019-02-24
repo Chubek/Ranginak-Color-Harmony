@@ -87,12 +87,27 @@ typedef float				fpshort;
 #define S_DFLT	12
 #define L_DFLT	75
 
-#define SHADE_MIN_VALID	0
+#define SHADE_MIN_VALID	1
 #define SHADE_MAX_VALID	100
-#define SHADE_MIN	0
+#define SHADE_MIN	1
 #define SHADE_MAX	100
 
-#define SHADE_DFLT_1	2
+#define SAT_MIN_VALID	1
+#define SAT_MAX_VALID	30
+#define SAT_MIN	1
+#define SAT_MAX	30
+
+#define SHADE_FACT_MIN_VALID	1
+#define SHADE_FACT_MAX_VALID	100
+#define SHADE_FACT_MIN	1
+#define SHADE_FACT_MAX	100
+
+#define SAT_FACT_MIN_VALID	1
+#define SAT_FACT_MAX_VALID	3
+#define SAT_FACT_MIN	1
+#define SAT_FACT_MAX	3
+
+#define SHADE_DFLT_1	20
 #define SHADE_DFLT_2	4
 #define SHADE_DFLT_3	6
 #define SHADE_DFLT_4	8
