@@ -617,6 +617,7 @@ PreRender(
 	PF_Err	err = PF_Err_NONE,
 			err2 = PF_Err_NONE;
 
+
 	PF_ParamDef popup_param;
 	PF_ParamDef	color_param;
 	PF_ParamDef	shade_1_param;
@@ -632,6 +633,21 @@ PreRender(
 
 	PF_RenderRequest req = extra->input->output_request;
 	PF_CheckoutResult in_result;
+	
+	AEFX_CLR_STRUCT(popup_param);
+	AEFX_CLR_STRUCT(color_param);
+	AEFX_CLR_STRUCT(shade_1_param);
+	AEFX_CLR_STRUCT(tint_1_param);
+	AEFX_CLR_STRUCT(tone_1_param);
+	AEFX_CLR_STRUCT(sat_1_param);
+	AEFX_CLR_STRUCT(shade_2_param);
+	AEFX_CLR_STRUCT(tint_2_param);
+	AEFX_CLR_STRUCT(tone_2_param);
+	AEFX_CLR_STRUCT(sat_2_param);
+	AEFX_CLR_STRUCT(angle_param);
+	AEFX_CLR_STRUCT(factor_param);
+	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_POPUP_PARAM,
@@ -639,7 +655,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&popup_param));
-	AEFX_CLR_STRUCT(popup_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_COLOR_PARAM,
@@ -647,7 +663,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&color_param));
-	AEFX_CLR_STRUCT(color_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_1_PARAM,
@@ -655,56 +671,56 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_1_param));
-	AEFX_CLR_STRUCT(shade_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_1_param));
-	AEFX_CLR_STRUCT(tint_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_1_param));
-	AEFX_CLR_STRUCT(tone_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_1_param));
-	AEFX_CLR_STRUCT(sat_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_2_param));
-	AEFX_CLR_STRUCT(shade_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_2_param));
-	AEFX_CLR_STRUCT(tint_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_2_param));
-	AEFX_CLR_STRUCT(tone_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_2_param));
-	AEFX_CLR_STRUCT(sat_1_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_GRAD_ANGLE_PARAM,
@@ -712,7 +728,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&angle_param));
-	AEFX_CLR_STRUCT(angle_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_BLEND_FACTOR_PARAM,
@@ -720,7 +736,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&factor_param));
-	AEFX_CLR_STRUCT(factor_param);
+	
 
 	ERR(extra->cb->checkout_layer(in_data->effect_ref,
 		GLATOR_INPUT,
@@ -780,13 +796,27 @@ SmartRender(
 	PF_ParamDef angle_param;
 	PF_ParamDef	factor_param;
 
+
+	AEFX_CLR_STRUCT(popup_param);
+	AEFX_CLR_STRUCT(color_param);
+	AEFX_CLR_STRUCT(shade_1_param);
+	AEFX_CLR_STRUCT(tint_1_param);
+	AEFX_CLR_STRUCT(tone_1_param);
+	AEFX_CLR_STRUCT(sat_1_param);
+	AEFX_CLR_STRUCT(shade_2_param);
+	AEFX_CLR_STRUCT(tint_2_param);
+	AEFX_CLR_STRUCT(tone_2_param);
+	AEFX_CLR_STRUCT(sat_2_param);
+	AEFX_CLR_STRUCT(angle_param);
+	AEFX_CLR_STRUCT(factor_param);
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_POPUP_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&popup_param));
-	AEFX_CLR_STRUCT(popup_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_COLOR_PARAM,
@@ -794,7 +824,7 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&color_param));
-	AEFX_CLR_STRUCT(color_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_1_PARAM,
@@ -802,56 +832,56 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_1_param));
-	AEFX_CLR_STRUCT(shade_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_1_param));
-	AEFX_CLR_STRUCT(tint_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_1_param));
-	AEFX_CLR_STRUCT(tone_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_1_param));
-	AEFX_CLR_STRUCT(sat_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_2_param));
-	AEFX_CLR_STRUCT(shade_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_2_param));
-	AEFX_CLR_STRUCT(tint_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_2_param));
-	AEFX_CLR_STRUCT(tone_1_param);
+	
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_2_param));
-	AEFX_CLR_STRUCT(sat_1_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_GRAD_ANGLE_PARAM,
@@ -859,7 +889,7 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&angle_param));
-	AEFX_CLR_STRUCT(angle_param);
+	
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_BLEND_FACTOR_PARAM,
@@ -867,9 +897,9 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&factor_param));
-	AEFX_CLR_STRUCT(factor_param);
 	
-	PF_FpLong	popup_val;
+	
+	A_long	popup_val;
 	PF_PixelFloat	color_val;
 	PF_FpLong	shade_1_val;
 	PF_FpLong	tint_1_val;
@@ -882,19 +912,27 @@ SmartRender(
 	PF_Fixed	angle_val;
 	PF_FpLong	factor_val;
 
+	PF_ParamDef color_defP = color_param;
+
 	if (!err){
 		//sliderVal = slider_param.u.fd.value / 100.0f;
 		popup_val = popup_param.u.pd.value;
-		suites.ColorParamSuite1()->PF_GetFloatingPointColorFromColorDef(in_data->effect_ref, &color_param, &color_val);
-		shade_1_val = shade_1_param.u.fs_d.value / 10.0f;
-		tint_1_val = tint_1_param.u.fs_d.value / 10.0f;
-		tone_1_val = tone_1_param.u.fs_d.value / 10.0f;
-		sat_1_val = sat_1_param.u.fs_d.value / 10.0f;
-		shade_2_val = shade_2_param.u.fs_d.value / 100.0f;
-		tint_2_val = shade_2_param.u.fs_d.value / 100.0f;
-		tone_2_val = shade_2_param.u.fs_d.value / 100.0f;
-		sat_2_val = shade_2_param.u.fs_d.value / 100.0f;
+		ERR(suites.ColorParamSuite1()->PF_GetFloatingPointColorFromColorDef(in_data->effect_ref, &color_defP, &color_val));
+		shade_1_val = shade_1_param.u.fs_d.value / 100.0f;
+		tint_1_val = tint_1_param.u.fs_d.value / 100.0f;
+		tone_1_val = tone_1_param.u.fs_d.value / 100.0f;
+		sat_1_val = sat_1_param.u.fs_d.value / 100.0f;
+		shade_2_val = shade_2_param.u.fs_d.value / 10.0f;
+		tint_2_val = tint_2_param.u.fs_d.value / 10.0f;
+		tone_2_val = tone_2_param.u.fs_d.value / 10.0f;
+		sat_2_val = sat_2_param.u.fs_d.value / 10.0f;
+		angle_val = angle_param.u.ad.value;
+		factor_val = factor_param.u.fs_d.value / 10.0f;
 	}
+
+	std::vector<GLfloat> main_color = { (GLfloat)color_val.red, (GLfloat)color_val.green, (GLfloat)color_val.blue };
+	std::vector<GLfloat> factorized_variants = { (GLfloat)shade_1_val, (GLfloat)tint_1_val, (GLfloat)tone_1_val, (GLfloat)sat_1_val };
+	std::vector<GLfloat> sub_variants = { (GLfloat)shade_2_val, (GLfloat)tint_2_val, (GLfloat)tone_2_val, (GLfloat)sat_2_val };
 
 	ERR((extra->cb->checkout_layer_pixels(in_data->effect_ref, GLATOR_INPUT, &input_worldP)));
 

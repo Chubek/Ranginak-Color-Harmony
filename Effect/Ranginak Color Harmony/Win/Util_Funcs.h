@@ -5,7 +5,21 @@
 namespace ColorUtils
 {
 
-	using color_type = std::vector<float>;
+	struct color_HSL
+	{
+		float H;
+		float S;
+		float L;
+	};
+
+	struct color_RGB
+	{
+		float R;
+		float G;
+		float B;
+		float a;
+	};
+
 
 	float Hue2RGB(float m1, float m2, float hue)
 	{
@@ -21,7 +35,7 @@ namespace ColorUtils
 		}
 		else if (hue * 3 < 2)
 		{
-			return m1 + (m2 - m1) * (2 / 3 - h) * 6;
+			return m1 + (m2 - m1) * (2 / 3 - hue) * 6;
 		}
 		else
 			return m1;
@@ -42,28 +56,34 @@ namespace ColorUtils
 
 	}
 
-	color_type HSL2RGB(float H, float S, float L)
+	color_RGB HSL2RGB(color_HSL color)
 	{
-		H = HueClamp(H) / 360;
+		color.H = HueClamp(color.H) / 360;
 		float m1, m2;
-		if (L <= 0.5)
+		if (color.L <= 0.5)
 		{
-			m2 = L * (S + 1);
+			m2 = color.L * (color.S + 1);
 		}
 		else
 		{
-			m2 = L + S - L * S;
+			m2 = color.L + color.S - color.L * color.S;
 		}
 
-		m1 = L * 2 - m2;
+		m1 = color.L * 2 - m2;
 
-		return { Hue2RGB(m1, m2, H + 1 / 3), Hue2RGB(m1, m2, H), Hue2RGB(m1, m2, H - 1 / 3), 1.0 };
+		color_RGB return_color;
+		return_color.R = Hue2RGB(m1, m2, color.H + 1 / 3);
+		return_color.G = Hue2RGB(m1, m2, color.H);
+		return_color.B = Hue2RGB(m1, m2, color.H - 1 / 3);
+		return_color.a = 1.0;
+
+		return return_color;
 	}
 
-	color_type RGB2HSL(float R, float G, float B)
+	color_HSL RGB2HSL(color_RGB color)
 	{
-		float min = std::fmin(std::fmin(R, G), B);
-		float max = std::fmax(std::fmax(R, G), B);
+		float min = std::fmin(std::fmin(color.R, color.G), color.B);
+		float max = std::fmax(std::fmax(color.R, color.G), color.B);
 
 		float delta = max - min;
 
@@ -81,112 +101,116 @@ namespace ColorUtils
 		if (delta > 0)
 		{
 
-			if (max == R && max == G) { H += (G - B) / delta; }
-			if (max == G && max == B) { H += 2 + (B - R) / delta; }
-			if (max == R && max == G) { H += 4 + (R - G) / delta; }
+			if (max == color.R && max == color.G) { H += (color.G - color.B) / delta; }
+			if (max == color.G && max == color.B) { H += 2 + (color.B - color.R) / delta; }
+			if (max == color.R && max == color.G) { H += 4 + (color.R - color.G) / delta; }
 
 			H /= 6;
 		}
 
-		if (H < 0) { H += 1 };
-		if (H > 1) { H -= 1 };
+		if (H < 0) { H += 1; };
+		if (H > 1) { H -= 1; };
 
-		return { H * 360, S, L };
+		color_HSL return_color;
+		return_color.H = H * 360;
+		return_color.S = S;
+		return_color.L = L;
+
+		return return_color;
 	}
 
 
-
-	color_type HueShift(color_type color, float delta)
+	color_HSL HueShift(color_HSL color, float delta)
 	{
-		return { color[0] + delta, color[1], color[2] };
+		return { color.H + delta, color.S, color.L };
 	}
 
-	color_type Complementary(color_type color)
+	color_HSL Complementary(color_HSL color)
 	{
 		return HueShift(color, 180);
 	}
 
-	std::vector<color_type> Analogous(color_type color, float angle)
+	std::vector<color_HSL> Analogous(color_HSL color, float angle)
 	{
 	return { HueShift(color, angle), HueShift(color, 360 - angle) };
 	}
 
-	std::vector<color_type> Triadic(color_type color)
+	std::vector<color_HSL> Triadic(color_HSL color)
 	{
 		return Analogous(color, 120)
 	}
 	
-	std::vector<color_type> SplitComplementary(color_type color, float angle)
+	std::vector<color_HSL> SplitComplementary(color_HSL color, float angle)
 	{
 		return Analogous(color, 180 - angle);
 	}
 
-	std::vector<color_type> Rectangle(color_type color)
+	std::vector<color_HSL> Rectangle(color_HSL color)
 	{
 		return { HueShift(color, 60), HueShift(color, 180),  HueShift(color, 120)};
 	}
 
-	std::vector<color_type> Square(color_type color)
+	std::vector<color_HSL> Square(color_HSL color)
 	{
 		return { HueShift(color, 90), HueShift(color, 180), HueShift(color, -90) };
 	}
 
-	color_type DesaturateTo(color_type color, float saturation)
+	color_HSL DesaturateTo(color_HSL color, float saturation)
 	{
-		return { color[0], saturation, color[2] };
+		return { color.H, saturation, color.L };
 	}
 
-	color_type DesaturateBy(color_type color, float factor)
+	color_HSL DesaturateBy(color_HSL color, float factor)
 	{
-		return { color[0], SLClamp(color[1] * factor), color[2] };
+		return { color.H, SLClamp(color.S * factor), color.L };
 	}
 
-	color_type LightenTo(color_type color, float lightness)
+	color_HSL LightenTo(color_HSL color, float lightness)
 	{
-		return { color[0], color[1], lightness };
+		return { color.H, color.S, lightness };
 	}
 
-	color_type LightenBy(color_type color, float factor)
+	color_HSL LightenBy(color_HSL color, float factor)
 	{
-		return { color[0], color[1], SLClamp(color[2] * factor) };
+		return { color.H, color.S, SLClamp(color.L * factor) };
 	}
 
-	color_type ShadeTo(color_type color, float i, float n)
+	color_HSL ShadeTo(color_HSL color, float i, float n)
 	{
-		return LightenTo(color, color[2] - (color[2]) / n * i);
+		return LightenTo(color, color.L - (color.L) / n * i);
 	}
 
-	color_type TintTo(color_type color, float r)
+	color_HSL TintTo(color_HSL color, float r)
 	{
-		return LightenTo(color, color[2] + (1 - color[2]) * r);
+		return LightenTo(color, color.L + (1 - color.L) * r);
 	}
 
-	color_type ToneTo(color_type color, float r)
+	color_HSL ToneTo(color_HSL color, float r)
 	{
-		return LightenTo(color, color[2] - color[2] * r);
+		return LightenTo(color, color.L - color.L * r);
 	}
 
-	color_type SaturateTo(color_type color, float r)
+	color_HSL SaturateTo(color_HSL color, float r)
 	{
 		return DesaturateTo(color, r);
 	}
 
-	color_type ShadeBy(color_type color, float i, float n)
+	color_HSL ShadeBy(color_HSL color, float i, float n)
 	{
-		return LightenBy(color, color[2] - (color[2]) / n * i);
+		return LightenBy(color, color.L - (color.L) / n * i);
 	}
 
-	color_type TintBy(color_type color, float r)
+	color_HSL TintBy(color_HSL color, float r)
 	{
-		return LightenBy(color, color[2] + (1 - color[2]) * r);
+		return LightenBy(color, color.L + (1 - color.L) * r);
 	}
 
-	color_type ByneBy(color_type color, float r)
+	color_HSL ByneBy(color_HSL color, float r)
 	{
-		return LightenBy(color, color[2] - color[2] * r);
+		return LightenBy(color, color.L - color.L * r);
 	}
 
-	color_type SaturateBy(color_type color, float r)
+	color_HSL SaturateBy(color_HSL color, float r)
 	{
 		return DesaturateBy(color, r);
 	}
