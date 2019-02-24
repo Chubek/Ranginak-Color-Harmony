@@ -137,7 +137,7 @@ namespace ColorUtils
 
 	std::vector<color_HSL> Triadic(color_HSL color)
 	{
-		return Analogous(color, 120)
+		return Analogous(color, 120);
 	}
 	
 	std::vector<color_HSL> SplitComplementary(color_HSL color, float angle)
@@ -147,7 +147,7 @@ namespace ColorUtils
 
 	std::vector<color_HSL> Rectangle(color_HSL color)
 	{
-		return { HueShift(color, 60), HueShift(color, 180),  HueShift(color, 120)};
+		return { HueShift(color, 60), HueShift(color, 180),  HueShift(color, 120) };
 	}
 
 	std::vector<color_HSL> Square(color_HSL color)

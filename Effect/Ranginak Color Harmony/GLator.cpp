@@ -41,6 +41,7 @@
 #include "GL_base.h"
 #include "Smart_Utils.h"
 #include "AEFX_SuiteHelper.h"
+#include "Util_Funcs.h"
 
 #include <thread>
 #include <atomic>
@@ -50,6 +51,7 @@
 #include <assert.h>
 #include <string>
 #include <vector>
+#include <map>
 using namespace AESDK_OpenGL;
 using namespace gl33core;
 
@@ -324,7 +326,9 @@ namespace {
 	void RenderGL(const AESDK_OpenGL::AESDK_OpenGL_EffectRenderDataPtr& renderContext,
 				  A_long widthL, A_long heightL,
 				  gl::GLuint		inputFrameTexture,
-				  PF_FpLong			sliderVal,
+				  std::map<std::string, ColorUtils::color_RGB>			RGBs,
+				  std::map<std::string, ColorUtils::color_HSL>			HSLs,
+				  std::map<std::string, GLfloat>						Params,
 				  float				multiplier16bit)
 	{
 		// - make sure we blend correctly inside the framebuffer
@@ -346,7 +350,7 @@ namespace {
 		GLint location = glGetUniformLocation(renderContext->mProgramObjSu, "ModelviewProjection");
 		glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)&ModelviewProjection);
 		location = glGetUniformLocation(renderContext->mProgramObjSu, "sliderVal");
-		glUniform1f(location, sliderVal);
+		//glUniform1f(location, sliderVal);
 		location = glGetUniformLocation(renderContext->mProgramObjSu, "multiplier16bit");
 		glUniform1f(location, multiplier16bit);
 
@@ -930,9 +934,32 @@ SmartRender(
 		factor_val = factor_param.u.fs_d.value / 10.0f;
 	}
 
-	std::vector<GLfloat> main_color = { (GLfloat)color_val.red, (GLfloat)color_val.green, (GLfloat)color_val.blue };
-	std::vector<GLfloat> factorized_variants = { (GLfloat)shade_1_val, (GLfloat)tint_1_val, (GLfloat)tone_1_val, (GLfloat)sat_1_val };
-	std::vector<GLfloat> sub_variants = { (GLfloat)shade_2_val, (GLfloat)tint_2_val, (GLfloat)tone_2_val, (GLfloat)sat_2_val };
+	std::map<std::string, ColorUtils::color_RGB> RGB_Colors;
+	std::map<std::string, ColorUtils::color_HSL> HSL_Colors;
+	std::map<std::string, GLfloat> SliderPlusAngle_Params;
+
+	ColorUtils::color_RGB main_color_RGB;
+	main_color_RGB.R = (GLfloat)color_val.red;
+	main_color_RGB.G = (GLfloat)color_val.green;
+	main_color_RGB.B = (GLfloat)color_val.blue;
+	main_color_RGB.a = (GLfloat)color_val.alpha;
+
+	RGB_Colors["Main Color"] = main_color_RGB;
+
+	HSL_Colors["Main Color"] = ColorUtils::RGB2HSL(main_color_RGB);
+
+	SliderPlusAngle_Params["Shade Factorized"] = shade_1_val;
+	SliderPlusAngle_Params["Tint Factorized"] = tint_1_val;
+	SliderPlusAngle_Params["Tone Factorized"] = tone_1_val;
+	SliderPlusAngle_Params["Saturation Factorized"] = sat_1_val;
+
+	SliderPlusAngle_Params["Shade Substitute"] = shade_2_val;
+	SliderPlusAngle_Params["Tint Substitute"] = tint_2_val;
+	SliderPlusAngle_Params["Tone Substitute"] = tone_2_val;
+	SliderPlusAngle_Params["Saturation Substitute"] = sat_2_val;
+
+	SliderPlusAngle_Params["Angle"] = angle_val;
+
 
 	ERR((extra->cb->checkout_layer_pixels(in_data->effect_ref, GLATOR_INPUT, &input_worldP)));
 
@@ -991,7 +1018,11 @@ SmartRender(
 			
 			// - simply blend the texture inside the frame buffer
 			// - TODO: hack your own shader there
-			RenderGL(renderContext, widthL, heightL, inputFrameTexture, sliderVal, multiplier16bit);
+			
+			
+			
+			
+			RenderGL(renderContext, widthL, heightL, inputFrameTexture, RGB_Colors, HSL_Colors, SliderPlusAngle_Params, multiplier16bit);
 
 			// - we toggle PBO textures (we use the PBO we just created as an input)
 			AESDK_OpenGL_MakeReadyToRender(*renderContext.get(), inputFrameTexture);
