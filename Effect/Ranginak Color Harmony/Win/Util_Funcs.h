@@ -157,7 +157,7 @@ namespace ColorUtils
 
 	color_HSL DesaturateTo(color_HSL color, float saturation)
 	{
-		return { color.H, saturation, color.L };
+		return { color.H, SLClamp(saturation), color.L };
 	}
 
 	color_HSL DesaturateBy(color_HSL color, float factor)
@@ -167,7 +167,7 @@ namespace ColorUtils
 
 	color_HSL LightenTo(color_HSL color, float lightness)
 	{
-		return { color.H, color.S, lightness };
+		return { color.H, color.S, SLClamp(lightness) };
 	}
 
 	color_HSL LightenBy(color_HSL color, float factor)
@@ -175,9 +175,9 @@ namespace ColorUtils
 		return { color.H, color.S, SLClamp(color.L * factor) };
 	}
 
-	color_HSL ShadeTo(color_HSL color, float i, float n)
+	color_HSL ShadeTo(color_HSL color, float i)
 	{
-		return LightenTo(color, color.L - (color.L) / n * i);
+		return LightenTo(color, color.L - (color.L) / i);
 	}
 
 	color_HSL TintTo(color_HSL color, float r)
@@ -192,12 +192,12 @@ namespace ColorUtils
 
 	color_HSL SaturateTo(color_HSL color, float r)
 	{
-		return DesaturateTo(color, r);
+		return DesaturateTo(color, color.S * r);
 	}
 
-	color_HSL ShadeBy(color_HSL color, float i, float n)
+	color_HSL ShadeBy(color_HSL color, float i)
 	{
-		return LightenBy(color, color.L - (color.L) / n * i);
+		return LightenBy(color, color.L - (color.L) / i);
 	}
 
 	color_HSL TintBy(color_HSL color, float r)
@@ -205,14 +205,14 @@ namespace ColorUtils
 		return LightenBy(color, color.L + (1 - color.L) * r);
 	}
 
-	color_HSL ByneBy(color_HSL color, float r)
+	color_HSL ToneBy(color_HSL color, float r)
 	{
 		return LightenBy(color, color.L - color.L * r);
 	}
 
 	color_HSL SaturateBy(color_HSL color, float r)
 	{
-		return DesaturateBy(color, r);
+		return DesaturateBy(color, (1 - color.S) * r);
 	}
 }
 

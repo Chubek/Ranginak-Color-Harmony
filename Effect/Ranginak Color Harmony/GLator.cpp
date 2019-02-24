@@ -960,6 +960,13 @@ SmartRender(
 
 	SliderPlusAngle_Params["Angle"] = angle_val;
 
+	bool Monochromatic_Shade = (popup_val == 1);
+	bool Complementary = (popup_val == 2);
+	bool Analogous = (popup_val == 3);
+	bool Triadic = (popup_val == 4);
+	bool Split_Complementary = (popup_val == 5);
+	bool Rectangle = (popup_val == 6);
+	bool Square = (popup_val == 7);
 
 	ERR((extra->cb->checkout_layer_pixels(in_data->effect_ref, GLATOR_INPUT, &input_worldP)));
 
@@ -1019,6 +1026,23 @@ SmartRender(
 			// - simply blend the texture inside the frame buffer
 			// - TODO: hack your own shader there
 			
+			if (Monochromatic_Shade)
+			{
+				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
+				ColorUtils::color_HSL complentary_2 = HSL_Colors["Main Color"];
+				ColorUtils::color_HSL complentary_3 = HSL_Colors["Main Color"];
+				ColorUtils::color_HSL complentary_4 = HSL_Colors["Main Color"];
+
+				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_2, tint_1_val);
+				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_4, sat_1_val);
+
+				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_1, shade_2_val);
+				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_3, tone_2_val);
+				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+			}
 			
 			
 			

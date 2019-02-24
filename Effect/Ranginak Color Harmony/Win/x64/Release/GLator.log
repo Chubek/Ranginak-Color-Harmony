@@ -1,2 +1,3 @@
 ﻿  GLator.cpp
-d:\ranginak-color-harmony\effect\ranginak color harmony\glator.cpp : fatal error C1041: cannot open program database 'D:\Ranginak-Color-Harmony\Effect\Ranginak Color Harmony\Win\x64\Release\vc141.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS
+     Creating library x64\Release\/GLator.lib and object x64\Release\/GLator.exp
+  GLator.vcxproj -> I:\Adobe.After.Effects.CC.16.0.0.235.x64.Portable\After.Effects.16\App\Ae\Plug-ins\GLator.aex
