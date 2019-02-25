@@ -532,23 +532,23 @@ ParamsSetup(
 
 	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS,  0, 0, RANG_SHADE_1_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TINT_1_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_2, PF_Precision_TENTHS, 0, 0, RANG_TINT_1_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TONE_1_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_3, PF_Precision_TENTHS, 0, 0, RANG_TONE_1_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Factor_Name), SAT_MIN_VALID, SAT_MAX_VALID, SAT_MIN, SAT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SAT_1_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Factor_Name), SAT_MIN_VALID, SAT_MAX_VALID, SAT_MIN, SAT_MAX, SHADE_DFLT_4, PF_Precision_TENTHS, 0, 0, RANG_SAT_1_ID);
 
 	PF_END_TOPIC(RANG_TOPIC_VARIANT_FACTOR_ID_END);
 
 	PF_ADD_TOPIC(STR(StrID_Variant_Substitute_Topic_Name), RANG_TOPIC_VARIANT_SUB_ID_START);
 
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_5, PF_Precision_TENTHS, 0, 0, RANG_SHADE_2_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TINT_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_6, PF_Precision_TENTHS, 0, 0, RANG_TINT_2_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_TONE_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tone_Substitute_Name), SHADE_FACT_MIN_VALID, SHADE_FACT_MAX_VALID, SHADE_FACT_MIN, SHADE_FACT_MAX, SHADE_DFLT_7, PF_Precision_TENTHS, 0, 0, RANG_TONE_2_ID);
 	AEFX_CLR_STRUCT(def);
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Substitute_Name), SAT_FACT_MIN_VALID, SAT_FACT_MAX_VALID, SAT_FACT_MIN, SAT_FACT_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SAT_2_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Saturate_Substitute_Name), SAT_FACT_MIN_VALID, SAT_FACT_MAX_VALID, SAT_FACT_MIN, SAT_FACT_MAX, SHADE_DFLT_8, PF_Precision_TENTHS, 0, 0, RANG_SAT_2_ID);
 
 	PF_END_TOPIC(RANG_TOPIC_VARIANT_SUB_ID_END);
 	AEFX_CLR_STRUCT(def);
@@ -947,17 +947,9 @@ SmartRender(
 
 	HSL_Colors["Main Color"] = ColorUtils::RGB2HSL(main_color_RGB);
 
-	SliderPlusAngle_Params["Shade Factorized"] = shade_1_val;
-	SliderPlusAngle_Params["Tint Factorized"] = tint_1_val;
-	SliderPlusAngle_Params["Tone Factorized"] = tone_1_val;
-	SliderPlusAngle_Params["Saturation Factorized"] = sat_1_val;
-
-	SliderPlusAngle_Params["Shade Substitute"] = shade_2_val;
-	SliderPlusAngle_Params["Tint Substitute"] = tint_2_val;
-	SliderPlusAngle_Params["Tone Substitute"] = tone_2_val;
-	SliderPlusAngle_Params["Saturation Substitute"] = sat_2_val;
-
 	SliderPlusAngle_Params["Angle"] = angle_val;
+	SliderPlusAngle_Params["Blend Factor"] = factor_val;
+
 
 	bool Monochromatic_Shade = (popup_val == 1);
 	bool Complementary = (popup_val == 2);
@@ -1235,7 +1227,7 @@ SmartRender(
 			if (Split_Complementary)
 			{
 
-				std::vector<ColorUtils::color_HSL> split_comp_colors = ColorUtils::SplitComplementary(HSL_Colors["Main Color"]);
+				std::vector<ColorUtils::color_HSL> split_comp_colors = ColorUtils::SplitComplementary(HSL_Colors["Main Color"], 150);
 
 
 				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
