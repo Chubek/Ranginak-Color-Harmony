@@ -39,12 +39,12 @@ typedef float				fpshort;
 #define PF_TABLE_SZ_16	4096
 
 #define PF_DEEP_COLOR_AWARE 1	// make sure we get 16bpc pixels; 
-								// AE_Effect.h checks for this.
+// AE_Effect.h checks for this.
 #include "AEConfig.h"
 
 #ifdef AE_OS_WIN
-	typedef unsigned short PixelType;
-	#include <Windows.h>
+typedef unsigned short PixelType;
+#include <Windows.h>
 #endif
 
 #include "entry.h"
@@ -64,16 +64,7 @@ typedef float				fpshort;
 #include <ctime>
 
 
-int random(int min, int max, int seed)
-{
-	srand(time(NULL)*time(NULL));
-	auto given_seed = std::time(NULL) * rand() * seed;
-	
-	std::mt19937 engine(given_seed);
-	std::uniform_int_distribution<int> dist(min, max);
 
-	return dist(engine);
-}
 /* Versioning information */
 
 #define	MAJOR_VERSION	1
@@ -87,9 +78,9 @@ int random(int min, int max, int seed)
 
 #define POPUP_NUM_MEM	7
 
-#define COLOR_RED_DFLT	random(0, 255, 14354212524524565790)
-#define COLOR_GREEN_DFLT	random(0, 255, 75614152456354135)
-#define COLOR_BLUE_DFLT	random(0, 255, 265612351341237)
+#define COLOR_RED_DFLT	75
+#define COLOR_GREEN_DFLT	25
+#define COLOR_BLUE_DFLT	32
 
 #define HSL_MIN_VALID	0
 #define HSL_MAX_VALID	100
@@ -105,38 +96,38 @@ int random(int min, int max, int seed)
 #define SHADE_MIN	1
 #define SHADE_MAX	100
 
-#define SAT_MIN_VALID	1
-#define SAT_MAX_VALID	30
-#define SAT_MIN	1
-#define SAT_MAX	30
+#define SAT_MIN_VALID	0
+#define SAT_MAX_VALID	1
+#define SAT_MIN	0
+#define SAT_MAX	1
 
-#define SHADE_FACT_MIN_VALID	1
-#define SHADE_FACT_MAX_VALID	100
-#define SHADE_FACT_MIN	1
-#define SHADE_FACT_MAX	100
+#define SHADE_FACT_MIN_VALID	0
+#define SHADE_FACT_MAX_VALID	1
+#define SHADE_FACT_MIN	0
+#define SHADE_FACT_MAX	1
 
 #define SAT_FACT_MIN_VALID	1
-#define SAT_FACT_MAX_VALID	30
+#define SAT_FACT_MAX_VALID	50
 #define SAT_FACT_MIN	1
-#define SAT_FACT_MAX	30
+#define SAT_FACT_MAX	50
 
-#define SHADE_DFLT_1	random(1, 100, 8734575799966468683)
-#define SHADE_DFLT_2	random(1, 100, 123413424646348)
-#define SHADE_DFLT_3	random(1, 100, 235624574684835858)
-#define SHADE_DFLT_4	random(1, 30, 67345757468683)
+#define SHADE_DFLT_1	50
+#define SHADE_DFLT_2	50
+#define SHADE_DFLT_3	50
+#define SHADE_DFLT_4	25
 
-#define SHADE_DFLT_5	random(1, 100, 973454525757468683)
-#define SHADE_DFLT_6	random(1, 100, 373464665757468683)
-#define SHADE_DFLT_7	random(1, 100, 4514513463572396859)
-#define SHADE_DFLT_8	random(1, 30, 1734575754546468683)
+#define SHADE_DFLT_5	50
+#define SHADE_DFLT_6	50
+#define SHADE_DFLT_7	50
+#define SHADE_DFLT_8	25
 
 #define ANGLE_DFLT  45
 
-#define BLEND_FACT_MIN_VALID	50
-#define BLEND_FACT_MAX_VALID	100
-#define BLEND_FACT_MIN			50
-#define BLEND_FACT_MAX			100
-#define BLEND_FACT_DFLT			random(5, 100, 3734865757468683)
+#define BLEND_FACT_MIN_VALID	1
+#define BLEND_FACT_MAX_VALID	50
+#define BLEND_FACT_MIN			1
+#define BLEND_FACT_MAX			50
+#define BLEND_FACT_DFLT			25
 
 enum {
 	GLATOR_INPUT = 0,
@@ -188,30 +179,30 @@ enum {
 	RANG_BLEND_FACTOR_PARAM,
 	RANG_TOPIC_MISC_PARAM_END,
 
-	
-	
+
+
 };
 
 
 extern "C" {
-	
+
 	DllExport
-	PF_Err 
-	EffectMain(
-		PF_Cmd			cmd,
-		PF_InData		*in_data,
-		PF_OutData		*out_data,
-		PF_ParamDef		*params[],
-		PF_LayerDef		*output,
-		void			*extra);
+		PF_Err
+		EffectMain(
+			PF_Cmd			cmd,
+			PF_InData		*in_data,
+			PF_OutData		*out_data,
+			PF_ParamDef		*params[],
+			PF_LayerDef		*output,
+			void			*extra);
 
 }
 
 //helper func
 inline u_char AlphaLookup(u_int16 inValSu, u_int16 inMaxSu)
 {
-	fpshort normValFp = 1.0f - (inValSu)/static_cast<fpshort>(inMaxSu);
-	return static_cast<u_char>(normValFp*normValFp*0.8f*255);
+	fpshort normValFp = 1.0f - (inValSu) / static_cast<fpshort>(inMaxSu);
+	return static_cast<u_char>(normValFp*normValFp*0.8f * 255);
 }
 
 //error checking macro

@@ -19,13 +19,11 @@
 /*                                                                 */
 /*******************************************************************/
 
-/*	GLator.cpp	
-
+/*	GLator.cpp
 	This is a sample OpenGL plugin. The framework is done for you.
 	Use it to create more funky effects.
-	
-	Revision History
 
+	Revision History
 	Version		Change													Engineer	Date
 	=======		======													========	======
 	1.0			Win and Mac versions use the same base files.			anindyar	7/4/2007
@@ -33,7 +31,6 @@
 				AE's own OpenGL usage (thanks Brendan Bolles!)			zal			8/13/2012
 	2.0			Completely re-written for OGL 3.3 and threads			aparente	9/30/2015
 	2.1			Added new entry point									zal			9/15/2017
-
 */
 
 #include "GLator.h"
@@ -150,12 +147,12 @@ namespace {
 	};
 
 	PF_Err
-	CopyPixelFloatIn(
-		void			*refcon,
-		A_long			x,
-		A_long			y,
-		PF_PixelFloat	*inP,
-		PF_PixelFloat	*)
+		CopyPixelFloatIn(
+			void			*refcon,
+			A_long			x,
+			A_long			y,
+			PF_PixelFloat	*inP,
+			PF_PixelFloat	*)
 	{
 		CopyPixelFloat_t	*thiS = reinterpret_cast<CopyPixelFloat_t*>(refcon);
 		PF_PixelFloat		*outP = thiS->floatBufferP + y * thiS->input_worldP->width + x;
@@ -169,12 +166,12 @@ namespace {
 	}
 
 	PF_Err
-	CopyPixelFloatOut(
-		void			*refcon,
-		A_long			x,
-		A_long			y,
-		PF_PixelFloat	*,
-		PF_PixelFloat	*outP)
+		CopyPixelFloatOut(
+			void			*refcon,
+			A_long			x,
+			A_long			y,
+			PF_PixelFloat	*,
+			PF_PixelFloat	*outP)
 	{
 		CopyPixelFloat_t		*thiS = reinterpret_cast<CopyPixelFloat_t*>(refcon);
 		const PF_PixelFloat		*inP = thiS->floatBufferP + y * thiS->input_worldP->width + x;
@@ -189,13 +186,13 @@ namespace {
 
 
 	gl::GLuint UploadTexture(AEGP_SuiteHandler& suites,					// >>
-							 PF_PixelFormat			format,				// >>
-							 PF_EffectWorld			*input_worldP,		// >>
-							 PF_EffectWorld			*output_worldP,		// >>
-							 PF_InData				*in_data,			// >>
-							 size_t& pixSizeOut,						// <<
-							 gl::GLenum& glFmtOut,						// <<
-							 float& multiplier16bitOut)					// <<
+		PF_PixelFormat			format,				// >>
+		PF_EffectWorld			*input_worldP,		// >>
+		PF_EffectWorld			*output_worldP,		// >>
+		PF_InData				*in_data,			// >>
+		size_t& pixSizeOut,						// <<
+		gl::GLenum& glFmtOut,						// <<
+		float& multiplier16bitOut)					// <<
 	{
 		// - upload to texture memory
 		// - we will convert on-the-fly from ARGB to RGBA, and also to pre-multiplied alpha,
@@ -294,9 +291,11 @@ namespace {
 
 
 	void SwizzleGL(const AESDK_OpenGL::AESDK_OpenGL_EffectRenderDataPtr& renderContext,
-				   A_long widthL, A_long heightL,
-				   gl::GLuint		inputFrameTexture,
-				   float			multiplier16bit)
+		A_long widthL, A_long heightL,
+		gl::GLuint		inputFrameTexture,
+		std::map<std::string, ColorUtils::color_RGB>			RGBs,
+		std::map<std::string, GLfloat>						Params,
+		float			multiplier16bit)
 	{
 		glBindTexture(GL_TEXTURE_2D, inputFrameTexture);
 
@@ -308,6 +307,62 @@ namespace {
 
 		GLint location = glGetUniformLocation(renderContext->mProgramObj2Su, "ModelviewProjection");
 		glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)&ModelviewProjection);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "angle");
+		glUniform1f(location, Params["Angle"]);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor");
+		glUniform1f(location, Params["Blend Factor"]);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "resolution");
+		glUniform2f(location, widthL, heightL);
+
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "main_color");
+		glUniform4f(location, RGBs["Main Color"].R, RGBs["Main Color"].G, RGBs["Main Color"].B, RGBs["Main Color"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_1");
+		glUniform4f(location, RGBs["Comp_1"].R, RGBs["Comp_1"].G, RGBs["Comp_1"].B, RGBs["Comp_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_2");
+		glUniform4f(location, RGBs["Comp_2"].R, RGBs["Comp_2"].G, RGBs["Comp_2"].B, RGBs["Comp_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_3");
+		glUniform4f(location, RGBs["Comp_3"].R, RGBs["Comp_3"].G, RGBs["Comp_3"].B, RGBs["Comp_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_4");
+		glUniform4f(location, RGBs["Comp_4"].R, RGBs["Comp_4"].G, RGBs["Comp4"].B, RGBs["Comp_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_1_color");
+		glUniform4f(location, RGBs["Fac_1_1"].R, RGBs["Fac_1_1"].G, RGBs["Fac_1_1"].B, RGBs["Fac_1_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_2_color");
+		glUniform4f(location, RGBs["Fac_1_2"].R, RGBs["Fac_1_2"].G, RGBs["Fac_1_2"].B, RGBs["Fac_1_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_3_color");
+		glUniform4f(location, RGBs["Fac_1_3"].R, RGBs["Fac_1_3"].G, RGBs["Fac_1_3"].B, RGBs["Fac_1_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_4_color");
+		glUniform4f(location, RGBs["Fac_1_4"].R, RGBs["Fac_1_4"].G, RGBs["Fac_1_4"].B, RGBs["Fac_1_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_1_color");
+		glUniform4f(location, RGBs["Sub_1_1"].R, RGBs["Sub_1_1"].G, RGBs["Sub_1_1"].B, RGBs["Sub_1_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_2_color");
+		glUniform4f(location, RGBs["Sub_1_2"].R, RGBs["Sub_1_2"].G, RGBs["Sub_1_2"].B, RGBs["Sub_1_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_3_color");
+		glUniform4f(location, RGBs["Sub_1_3"].R, RGBs["Sub_1_3"].G, RGBs["Sub_1_3"].B, RGBs["Sub_1_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_4_color");
+		glUniform4f(location, RGBs["Sub_1_4"].R, RGBs["Sub_1_4"].G, RGBs["Sub_1_4"].B, RGBs["Sub_1_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_1_color");
+		glUniform4f(location, RGBs["Fac_2_1"].R, RGBs["Fac_2_1"].G, RGBs["Fac_2_1"].B, RGBs["Fac_2_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_2_color");
+		glUniform4f(location, RGBs["Fac_2_2"].R, RGBs["Fac_2_2"].G, RGBs["Fac_2_2"].B, RGBs["Fac_2_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_3_color");
+		glUniform4f(location, RGBs["Fac_2_3"].R, RGBs["Fac_2_3"].G, RGBs["Fac_2_3"].B, RGBs["Fac_2_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_4_color");
+		glUniform4f(location, RGBs["Fac_2_4"].R, RGBs["Fac_2_4"].G, RGBs["Fac_2_4"].B, RGBs["Fac_2_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_1_color");
+		glUniform4f(location, RGBs["Sub_2_1"].R, RGBs["Sub_2_1"].G, RGBs["Sub_2_1"].B, RGBs["Sub_2_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_2_color");
+		glUniform4f(location, RGBs["Sub_2_2"].R, RGBs["Sub_2_2"].G, RGBs["Sub_2_2"].B, RGBs["Sub_2_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_3_color");
+		glUniform4f(location, RGBs["Sub_2_3"].R, RGBs["Sub_2_3"].G, RGBs["Sub_2_3"].B, RGBs["Sub_2_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_4_color");
+		glUniform4f(location, RGBs["Sub_2_4"].R, RGBs["Sub_2_4"].G, RGBs["Sub_2_4"].B, RGBs["Sub_2_4"].a);
+
 		location = glGetUniformLocation(renderContext->mProgramObj2Su, "multiplier16bit");
 		glUniform1f(location, multiplier16bit);
 
@@ -324,11 +379,11 @@ namespace {
 	}
 
 	void RenderGL(const AESDK_OpenGL::AESDK_OpenGL_EffectRenderDataPtr& renderContext,
-				  A_long widthL, A_long heightL,
-				  gl::GLuint		inputFrameTexture,
-				  std::map<std::string, ColorUtils::color_RGB>			RGBs,
-				  std::map<std::string, GLfloat>						Params,
-				  float				multiplier16bit)
+		A_long widthL, A_long heightL,
+		gl::GLuint		inputFrameTexture,
+		std::map<std::string, ColorUtils::color_RGB>			RGBs,
+		std::map<std::string, GLfloat>						Params,
+		float				multiplier16bit)
 	{
 		// - make sure we blend correctly inside the framebuffer
 		// - even though we just cleared it, another effect may want to first
@@ -348,8 +403,60 @@ namespace {
 		// program uniforms
 		GLint location = glGetUniformLocation(renderContext->mProgramObjSu, "ModelviewProjection");
 		glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)&ModelviewProjection);
-		location = glGetUniformLocation(renderContext->mProgramObjSu, "sliderVal");
-		//glUniform1f(location, sliderVal);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "angle");
+		glUniform1f(location, Params["Angle"] );
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor");
+		glUniform1f(location, Params["Blend Factor"]);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "resolution");
+		glUniform2f(location, widthL, heightL);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "main_color");
+		glUniform4f(location, RGBs["Main Color"].R, RGBs["Main Color"].G, RGBs["Main Color"].B, RGBs["Main Color"].a );
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_1");
+		glUniform4f(location, RGBs["Comp_1"].R, RGBs["Comp_1"].G, RGBs["Comp_1"].B, RGBs["Comp_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_2");
+		glUniform4f(location, RGBs["Comp_2"].R, RGBs["Comp_2"].G, RGBs["Comp_2"].B, RGBs["Comp_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_3");
+		glUniform4f(location, RGBs["Comp_3"].R, RGBs["Comp_3"].G, RGBs["Comp_3"].B, RGBs["Comp_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "complement_color_4");
+		glUniform4f(location, RGBs["Comp_4"].R, RGBs["Comp_4"].G, RGBs["Comp_4"].B, RGBs["Comp_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_1_color");
+		glUniform4f(location, RGBs["Fac_1_1"].R, RGBs["Fac_1_1"].G, RGBs["Fac_1_1"].B, RGBs["Fac_1_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_2_color");
+		glUniform4f(location, RGBs["Fac_1_2"].R, RGBs["Fac_1_2"].G, RGBs["Fac_1_2"].B, RGBs["Fac_1_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_3_color");
+		glUniform4f(location, RGBs["Fac_1_3"].R, RGBs["Fac_1_3"].G, RGBs["Fac_1_3"].B, RGBs["Fac_1_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_4_color");
+		glUniform4f(location, RGBs["Fac_1_4"].R, RGBs["Fac_1_4"].G, RGBs["Fac_1_4"].B, RGBs["Fac_1_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_1_color");
+		glUniform4f(location, RGBs["Sub_1_1"].R, RGBs["Sub_1_1"].G, RGBs["Sub_1_1"].B, RGBs["Sub_1_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_2_color");
+		glUniform4f(location, RGBs["Sub_1_2"].R, RGBs["Sub_1_2"].G, RGBs["Sub_1_2"].B, RGBs["Sub_1_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_3_color");
+		glUniform4f(location, RGBs["Sub_1_3"].R, RGBs["Sub_1_3"].G, RGBs["Sub_1_3"].B, RGBs["Sub_1_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_1_4_color");
+		glUniform4f(location, RGBs["Sub_1_4"].R, RGBs["Sub_1_4"].G, RGBs["Sub_1_4"].B, RGBs["Sub_1_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_1_color");
+		glUniform4f(location, RGBs["Fac_2_1"].R, RGBs["Fac_2_1"].G, RGBs["Fac_2_1"].B, RGBs["Fac_2_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_2_color");
+		glUniform4f(location, RGBs["Fac_2_2"].R, RGBs["Fac_2_2"].G, RGBs["Fac_2_2"].B, RGBs["Fac_2_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_3_color");
+		glUniform4f(location, RGBs["Fac_2_3"].R, RGBs["Fac_2_3"].G, RGBs["Fac_2_3"].B, RGBs["Fac_2_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_4_color");
+		glUniform4f(location, RGBs["Fac_2_4"].R, RGBs["Fac_2_4"].G, RGBs["Fac_2_4"].B, RGBs["Fac_2_4"].a);
+
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_1_color");
+		glUniform4f(location, RGBs["Sub_2_1"].R, RGBs["Sub_2_1"].G, RGBs["Sub_2_1"].B, RGBs["Sub_2_1"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_2_color");
+		glUniform4f(location, RGBs["Sub_2_2"].R, RGBs["Sub_2_2"].G, RGBs["Sub_2_2"].B, RGBs["Sub_2_2"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_3_color");
+		glUniform4f(location, RGBs["Sub_2_3"].R, RGBs["Sub_2_3"].G, RGBs["Sub_2_3"].B, RGBs["Sub_2_3"].a);
+		location = glGetUniformLocation(renderContext->mProgramObjSu, "factor_2_4_color");
+		glUniform4f(location, RGBs["Sub_2_4"].R, RGBs["Sub_2_4"].G, RGBs["Sub_2_4"].B, RGBs["Sub_2_4"].a);
+
 		location = glGetUniformLocation(renderContext->mProgramObjSu, "multiplier16bit");
 		glUniform1f(location, multiplier16bit);
 
@@ -366,14 +473,14 @@ namespace {
 	}
 
 	void DownloadTexture(const AESDK_OpenGL::AESDK_OpenGL_EffectRenderDataPtr& renderContext,
-						 AEGP_SuiteHandler&		suites,				// >>
-						 PF_EffectWorld			*input_worldP,		// >>
-						 PF_EffectWorld			*output_worldP,		// >>
-						 PF_InData				*in_data,			// >>
-						 PF_PixelFormat			format,				// >>
-						 size_t					pixSize,			// >>
-						 gl::GLenum				glFmt				// >>
-						 )
+		AEGP_SuiteHandler&		suites,				// >>
+		PF_EffectWorld			*input_worldP,		// >>
+		PF_EffectWorld			*output_worldP,		// >>
+		PF_InData				*in_data,			// >>
+		PF_PixelFormat			format,				// >>
+		size_t					pixSize,			// >>
+		gl::GLenum				glFmt				// >>
+	)
 	{
 		//download from texture memory onto the same surface
 		PF_Handle bufferH = NULL;
@@ -447,42 +554,42 @@ namespace {
 	}
 } // anonymous namespace
 
-static PF_Err 
-About (	
+static PF_Err
+About(
 	PF_InData		*in_data,
 	PF_OutData		*out_data,
 	PF_ParamDef		*params[],
-	PF_LayerDef		*output )
+	PF_LayerDef		*output)
 {
 	AEGP_SuiteHandler suites(in_data->pica_basicP);
-	
-	suites.ANSICallbacksSuite1()->sprintf(	out_data->return_msg,
-											"%s v%d.%d\r%s",
-											STR(StrID_Name), 
-											MAJOR_VERSION, 
-											MINOR_VERSION, 
-											STR(StrID_Description));
+
+	suites.ANSICallbacksSuite1()->sprintf(out_data->return_msg,
+		"%s v%d.%d\r%s",
+		STR(StrID_Name),
+		MAJOR_VERSION,
+		MINOR_VERSION,
+		STR(StrID_Description));
 	return PF_Err_NONE;
 }
 
 static PF_Err
-GlobalSetup (	
+GlobalSetup(
 	PF_InData		*in_data,
 	PF_OutData		*out_data,
 	PF_ParamDef		*params[],
-	PF_LayerDef		*output )
+	PF_LayerDef		*output)
 {
-	out_data->my_version = PF_VERSION(	MAJOR_VERSION, 
-										MINOR_VERSION,
-										BUG_VERSION, 
-										STAGE_VERSION, 
-										BUILD_VERSION);
+	out_data->my_version = PF_VERSION(MAJOR_VERSION,
+		MINOR_VERSION,
+		BUG_VERSION,
+		STAGE_VERSION,
+		BUILD_VERSION);
 
-	out_data->out_flags = 	PF_OutFlag_DEEP_COLOR_AWARE;
-	
-	out_data->out_flags2 =	PF_OutFlag2_FLOAT_COLOR_AWARE	|
-							PF_OutFlag2_SUPPORTS_SMART_RENDER;
-	
+	out_data->out_flags = PF_OutFlag_DEEP_COLOR_AWARE;
+
+	out_data->out_flags2 = PF_OutFlag2_FLOAT_COLOR_AWARE |
+		PF_OutFlag2_SUPPORTS_SMART_RENDER;
+
 	PF_Err err = PF_Err_NONE;
 	try
 	{
@@ -493,10 +600,10 @@ GlobalSetup (
 		//Now comes the OpenGL part - OS specific loading to start with
 		S_GLator_EffectCommonData.reset(new AESDK_OpenGL::AESDK_OpenGL_EffectCommonData());
 		AESDK_OpenGL_Startup(*S_GLator_EffectCommonData.get());
-		
+
 		S_ResourcePath = GetResourcesPath(in_data);
 	}
-	catch(PF_Err& thrown_err)
+	catch (PF_Err& thrown_err)
 	{
 		err = thrown_err;
 	}
@@ -508,7 +615,7 @@ GlobalSetup (
 	return err;
 }
 
-static PF_Err 
+static PF_Err
 ParamsSetup(
 	PF_InData		*in_data,
 	PF_OutData		*out_data,
@@ -530,7 +637,7 @@ ParamsSetup(
 	AEFX_CLR_STRUCT(def);
 	PF_ADD_TOPIC(STR(StrID_Variant_Factor_Topic_Name), RANG_TOPIC_VARIANT_FACTOR_ID_START);
 
-	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS,  0, 0, RANG_SHADE_1_ID);
+	PF_ADD_FLOAT_SLIDERX(STR(StrID_Shade_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_1, PF_Precision_TENTHS, 0, 0, RANG_SHADE_1_ID);
 	AEFX_CLR_STRUCT(def);
 	PF_ADD_FLOAT_SLIDERX(STR(StrID_Tint_Factor_Name), SHADE_MIN_VALID, SHADE_MAX_VALID, SHADE_MIN, SHADE_MAX, SHADE_DFLT_2, PF_Precision_TENTHS, 0, 0, RANG_TINT_1_ID);
 	AEFX_CLR_STRUCT(def);
@@ -558,27 +665,27 @@ ParamsSetup(
 	AEFX_CLR_STRUCT(def);
 	PF_ADD_FLOAT_SLIDERX(STR(StrID_Blend_Factor), BLEND_FACT_MIN_VALID, BLEND_FACT_MAX_VALID, BLEND_FACT_MIN, BLEND_FACT_MAX, BLEND_FACT_DFLT, PF_Precision_TENTHS, 0, 0, RANG_BLEND_FACTOR_ID);
 	AEFX_CLR_STRUCT(def)
-	PF_END_TOPIC(RANG_TOPIC_MISC_ID_END);
+		PF_END_TOPIC(RANG_TOPIC_MISC_ID_END);
 	AEFX_CLR_STRUCT(def)
 
 
 
 
 
-	out_data->num_params = GLATOR_NUM_PARAMS;
+		out_data->num_params = GLATOR_NUM_PARAMS;
 
 	return err;
 }
 
 
-static PF_Err 
-GlobalSetdown (
+static PF_Err
+GlobalSetdown(
 	PF_InData		*in_data,
 	PF_OutData		*out_data,
 	PF_ParamDef		*params[],
-	PF_LayerDef		*output )
+	PF_LayerDef		*output)
 {
-	PF_Err			err			=	PF_Err_NONE;
+	PF_Err			err = PF_Err_NONE;
 
 	try
 	{
@@ -599,7 +706,7 @@ GlobalSetdown (
 			out_data->sequence_data = NULL;
 		}
 	}
-	catch(PF_Err& thrown_err)
+	catch (PF_Err& thrown_err)
 	{
 		err = thrown_err;
 	}
@@ -618,7 +725,7 @@ PreRender(
 	PF_PreRenderExtra		*extra)
 {
 	PF_Err	err = PF_Err_NONE,
-			err2 = PF_Err_NONE;
+		err2 = PF_Err_NONE;
 
 
 	PF_ParamDef popup_param;
@@ -636,7 +743,7 @@ PreRender(
 
 	PF_RenderRequest req = extra->input->output_request;
 	PF_CheckoutResult in_result;
-	
+
 	AEFX_CLR_STRUCT(popup_param);
 	AEFX_CLR_STRUCT(color_param);
 	AEFX_CLR_STRUCT(shade_1_param);
@@ -649,7 +756,7 @@ PreRender(
 	AEFX_CLR_STRUCT(sat_2_param);
 	AEFX_CLR_STRUCT(angle_param);
 	AEFX_CLR_STRUCT(factor_param);
-	
+
 
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
@@ -658,7 +765,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&popup_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_COLOR_PARAM,
@@ -666,7 +773,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&color_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_1_PARAM,
@@ -674,56 +781,56 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_2_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_2_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_2_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_2_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_GRAD_ANGLE_PARAM,
@@ -731,7 +838,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&angle_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_BLEND_FACTOR_PARAM,
@@ -739,7 +846,7 @@ PreRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&factor_param));
-	
+
 
 	ERR(extra->cb->checkout_layer(in_data->effect_ref,
 		GLATOR_INPUT,
@@ -750,7 +857,7 @@ PreRender(
 		in_data->time_scale,
 		&in_result));
 
-	if (!err){
+	if (!err) {
 		UnionLRect(&in_result.result_rect, &extra->output->result_rect);
 		UnionLRect(&in_result.max_result_rect, &extra->output->max_result_rect);
 	}
@@ -776,10 +883,10 @@ SmartRender(
 	PF_SmartRenderExtra		*extra)
 {
 	PF_Err				err = PF_Err_NONE,
-						err2 = PF_Err_NONE;
+		err2 = PF_Err_NONE;
 
 	PF_EffectWorld		*input_worldP = NULL,
-						*output_worldP = NULL;
+		*output_worldP = NULL;
 	PF_WorldSuite2		*wsP = NULL;
 	PF_PixelFormat		format = PF_PixelFormat_INVALID;
 	PF_FpLong			sliderVal = 0;
@@ -819,7 +926,7 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&popup_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_COLOR_PARAM,
@@ -827,7 +934,7 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&color_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_1_PARAM,
@@ -835,56 +942,56 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_1_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_1_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SHADE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&shade_2_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TINT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tint_2_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_TONE_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&tone_2_param));
-	
+
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_SAT_2_PARAM,
 		in_data->current_time,
 		in_data->time_step,
 		in_data->time_scale,
 		&sat_2_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_GRAD_ANGLE_PARAM,
@@ -892,7 +999,7 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&angle_param));
-	
+
 
 	ERR(PF_CHECKOUT_PARAM(in_data,
 		RANG_BLEND_FACTOR_PARAM,
@@ -900,8 +1007,8 @@ SmartRender(
 		in_data->time_step,
 		in_data->time_scale,
 		&factor_param));
-	
-	
+
+
 	A_long	popup_val;
 	PF_PixelFloat	color_val;
 	PF_FpLong	shade_1_val;
@@ -917,20 +1024,20 @@ SmartRender(
 
 	PF_ParamDef color_defP = color_param;
 
-	if (!err){
+	if (!err) {
 		//sliderVal = slider_param.u.fd.value / 100.0f;
 		popup_val = popup_param.u.pd.value;
 		ERR(suites.ColorParamSuite1()->PF_GetFloatingPointColorFromColorDef(in_data->effect_ref, &color_defP, &color_val));
-		shade_1_val = shade_1_param.u.fs_d.value / 100.0f;
-		tint_1_val = tint_1_param.u.fs_d.value / 100.0f;
-		tone_1_val = tone_1_param.u.fs_d.value / 100.0f;
-		sat_1_val = sat_1_param.u.fs_d.value / 100.0f;
-		shade_2_val = shade_2_param.u.fs_d.value / 10.0f;
-		tint_2_val = tint_2_param.u.fs_d.value / 10.0f;
-		tone_2_val = tone_2_param.u.fs_d.value / 10.0f;
-		sat_2_val = sat_2_param.u.fs_d.value / 10.0f;
+		shade_1_val = shade_1_param.u.fs_d.value/ 10.0f;
+		tint_1_val = tint_1_param.u.fs_d.value/ 10.0f;
+		tone_1_val = tone_1_param.u.fs_d.value / 10.0f;
+		sat_1_val = sat_1_param.u.fs_d.value / 10.0f;
+		shade_2_val = shade_2_param.u.fs_d.value / 100.0f;
+		tint_2_val = tint_2_param.u.fs_d.value / 100.0f;
+		tone_2_val = tone_2_param.u.fs_d.value / 100.0f;
+		sat_2_val = sat_2_param.u.fs_d.value / 100.0f;
 		angle_val = angle_param.u.ad.value;
-		factor_val = factor_param.u.fs_d.value / 10.0f;
+		factor_val = factor_param.u.fs_d.value / 100.0f;
 	}
 
 	std::map<std::string, ColorUtils::color_RGB> RGB_Colors;
@@ -970,7 +1077,7 @@ SmartRender(
 		"Couldn't load suite.",
 		(void**)&wsP));
 
-	if (!err){
+	if (!err) {
 		try
 		{
 			// always restore back AE's own OGL context
@@ -987,7 +1094,7 @@ SmartRender(
 			}
 
 			renderContext->SetPluginContext();
-			
+
 			// - Gremedy OpenGL debugger
 			// - Example of using a OpenGL extension
 			bool hasGremedy = renderContext->mExtensions.find(gl::GLextension::GL_GREMEDY_frame_terminator) != renderContext->mExtensions.end();
@@ -1005,7 +1112,7 @@ SmartRender(
 			gl::GLenum glFmt;
 			float multiplier16bit;
 			gl::GLuint inputFrameTexture = UploadTexture(suites, format, input_worldP, output_worldP, in_data, pixSize, glFmt, multiplier16bit);
-			
+
 			// Set up the frame-buffer object just like a window.
 			AESDK_OpenGL_MakeReadyToRender(*renderContext.get(), renderContext->mOutputFrameTexture);
 			ReportIfErrorFramebuffer(in_data, out_data);
@@ -1013,16 +1120,18 @@ SmartRender(
 			glViewport(0, 0, widthL, heightL);
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
-			
+
 			// - simply blend the texture inside the frame buffer
 			// - TODO: hack your own shader there
-			
+
 			if (Monochromatic_Shade)
 			{
 				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
 				ColorUtils::color_HSL complentary_2 = HSL_Colors["Main Color"];
 				ColorUtils::color_HSL complentary_3 = HSL_Colors["Main Color"];
 				ColorUtils::color_HSL complentary_4 = HSL_Colors["Main Color"];
+
+
 
 				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
 				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
@@ -1051,21 +1160,21 @@ SmartRender(
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+
 			}
 			if (Complementary)
 			{
@@ -1095,26 +1204,27 @@ SmartRender(
 				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
 				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
 
+
 				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
 				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
 				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
 
 			}
 			if (Analogous)
@@ -1148,26 +1258,27 @@ SmartRender(
 				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
 				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
 
+
 				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
 				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
 				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
 
 			}
 			if (Triadic)
@@ -1208,20 +1319,20 @@ SmartRender(
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
 
 			}
 			if (Split_Complementary)
@@ -1262,21 +1373,20 @@ SmartRender(
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
 			}
 			if (Rectangle)
 			{
@@ -1316,21 +1426,20 @@ SmartRender(
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
 			}
 			if (Square)
 			{
@@ -1364,29 +1473,30 @@ SmartRender(
 				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
 				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
 
+
 				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
 				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
 				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
 				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
 				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
 				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
 				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
 				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
 				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
 				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
 				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
 
 			}
-			
+
 			RenderGL(renderContext, widthL, heightL, inputFrameTexture, RGB_Colors, SliderPlusAngle_Params, multiplier16bit);
 
 			// - we toggle PBO textures (we use the PBO we just created as an input)
@@ -1396,7 +1506,7 @@ SmartRender(
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			// swizzle using the previous output
-			SwizzleGL(renderContext, widthL, heightL, renderContext->mOutputFrameTexture, multiplier16bit);
+			SwizzleGL(renderContext, widthL, heightL, renderContext->mOutputFrameTexture, RGB_Colors, SliderPlusAngle_Params, multiplier16bit);
 
 			if (hasGremedy) {
 				gl::glFrameTerminatorGREMEDY();
@@ -1480,51 +1590,49 @@ EffectMain(
 	void			*extra)
 {
 	PF_Err		err = PF_Err_NONE;
-	
+
 	try {
 		switch (cmd) {
-			case PF_Cmd_ABOUT:
-				err = About(in_data,
-							out_data,
-							params,
-							output);
-				break;
-				
-			case PF_Cmd_GLOBAL_SETUP:
-				err = GlobalSetup(	in_data,
-									out_data,
-									params,
-									output);
-				break;
-				
-			case PF_Cmd_PARAMS_SETUP:
-				err = ParamsSetup(	in_data,
-									out_data,
-									params,
-									output);
-				break;
-				
-			case PF_Cmd_GLOBAL_SETDOWN:
-				err = GlobalSetdown(	in_data,
-										out_data,
-										params,
-										output);
-				break;
+		case PF_Cmd_ABOUT:
+			err = About(in_data,
+				out_data,
+				params,
+				output);
+			break;
 
-			case  PF_Cmd_SMART_PRE_RENDER:
-				err = PreRender(in_data, out_data, reinterpret_cast<PF_PreRenderExtra*>(extra));
-				break;
+		case PF_Cmd_GLOBAL_SETUP:
+			err = GlobalSetup(in_data,
+				out_data,
+				params,
+				output);
+			break;
 
-			case  PF_Cmd_SMART_RENDER:
-				err = SmartRender(in_data, out_data, reinterpret_cast<PF_SmartRenderExtra*>(extra));
-				break;
+		case PF_Cmd_PARAMS_SETUP:
+			err = ParamsSetup(in_data,
+				out_data,
+				params,
+				output);
+			break;
+
+		case PF_Cmd_GLOBAL_SETDOWN:
+			err = GlobalSetdown(in_data,
+				out_data,
+				params,
+				output);
+			break;
+
+		case  PF_Cmd_SMART_PRE_RENDER:
+			err = PreRender(in_data, out_data, reinterpret_cast<PF_PreRenderExtra*>(extra));
+			break;
+
+		case  PF_Cmd_SMART_RENDER:
+			err = SmartRender(in_data, out_data, reinterpret_cast<PF_SmartRenderExtra*>(extra));
+			break;
 		}
 	}
-	catch(PF_Err &thrown_err){
+	catch (PF_Err &thrown_err) {
 		err = thrown_err;
 	}
 	return err;
 }
-
-
 

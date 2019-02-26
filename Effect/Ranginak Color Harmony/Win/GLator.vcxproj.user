@@ -4,15 +4,7 @@
     <LocalDebuggerCommand>I:\Adobe.After.Effects.CC.16.0.0.235.x64.Portable\After.Effects.16\App\Ae\AfterFX.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommand>I:\Adobe.After.Effects.CC.16.0.0.235.x64.Portable\After.Effects.16\App\Ae\AfterFX.exe</LocalDebuggerCommand>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>I:\Adobe.After.Effects.CC.16.0.0.235.x64.Portable\After.Effects.16\App\Ae\AfterFX.exe</LocalDebuggerCommand>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>I:\Adobe.After.Effects.CC.16.0.0.235.x64.Portable\After.Effects.16\App\Ae\AfterFX.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

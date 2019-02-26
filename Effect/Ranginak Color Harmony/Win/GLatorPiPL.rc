@@ -16,14 +16,14 @@ BEGIN
 	"MIB8",
 	"eman",
 	0, 0x0,
-	8, 0x0,
-	"\x06GLator\0", 
+	24, 0x0,
+	"\x15eyeRees Color Harmony\0\0", 
 
 	"MIB8",
 	"gtac", 
 	0, 0x0,
 	16, 0x0,
-	"\x0FSample Plug-ins", 
+	"\x0FPartly Shaderly", 
 
 	"MIB8",
 	"4668", 
@@ -70,8 +70,8 @@ BEGIN
 	"MIB8",
 	"ANMe",
 	0, 0x0,
-	12, 0x0,
-	"\x0BADBE GLator", 
+	16, 0x0,
+	"\x0CADBE eyeRees\0\0\0", 
 
 	"MIB8",
 	0x6165464CL, 

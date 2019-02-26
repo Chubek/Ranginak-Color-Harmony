@@ -30,8 +30,8 @@ typedef struct {
 
 TableString		g_strs[StrID_NUMTYPES] = {
 	StrID_NONE,						"",
-	StrID_Name,						"GLator",
-	StrID_Description,				"A very basic OpenGL implementation, within a plug-in.\rCopyright 2007 Adobe Systems Incorporated.",
+	StrID_Name,						"eyeRees Color Harmony",
+	StrID_Description,				"Copyright 2019 Partly Shaderly. Written by Chubak Bidpaa. \n eyeRees is named after Iris, Goddess of Color and Rainbow.",
 	StrID_Color_Param_Name,			"Color",
 	StrID_Color_Topic_Name,			"Color Parameters",
 	StrID_Popup_Name,				"Harmony Mode",
@@ -71,5 +71,3 @@ char	*GetStringPtr(int strNum)
 {
 	return g_strs[strNum].str;
 }
-
-	

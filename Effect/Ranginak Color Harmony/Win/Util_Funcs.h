@@ -23,7 +23,8 @@ namespace ColorUtils
 
 	float Hue2RGB(float m1, float m2, float hue)
 	{
-		(hue < 0) ? (hue += 1) : (hue -= 1);
+		if (hue < 0) { hue += 1; };
+		if (hue > 1) { hue -= 1; };
 
 		if (hue * 6 < 1)
 		{
@@ -49,7 +50,7 @@ namespace ColorUtils
 	float SLClamp(float value)
 	{
 
-		value = (value > 1.0) ? value = 1.0 : value;
+		value = (value > 0.8) ? value = 0.8 : value;
 		value = (value < 0.01) ? value = 0.01 : value;
 
 		return value;
@@ -58,7 +59,7 @@ namespace ColorUtils
 
 	color_RGB HSL2RGB(color_HSL color)
 	{
-		color.H = HueClamp(color.H) / 360;
+		color.H = color.H / 360;
 		float m1, m2;
 		if (color.L <= 0.5)
 		{

@@ -13,11 +13,11 @@ resource 'PiPL' (16000) {
 		},
 		/* [2] */
 		Name {
-			"GLator"
+			"eyeRees Color Harmony"
 		},
 		/* [3] */
 		Category {
-			"Sample Plug-ins"
+			"Partly Shaderly"
 		},
 #ifdef AE_OS_WIN
 	#ifdef AE_PROC_INTELx64
@@ -56,7 +56,7 @@ resource 'PiPL' (16000) {
 		},
 		/* [11] */
 		AE_Effect_Match_Name {
-			"ADBE GLator"
+			"ADBE eyeRees"
 		},
 		/* [12] */
 		AE_Reserved_Info {
@@ -64,4 +64,3 @@ resource 'PiPL' (16000) {
 		}
 	}
 };
-

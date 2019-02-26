@@ -1,2 +1,4 @@
 ﻿  GLator.cpp
+  GLator_Strings.cpp
+     Creating library x64\Release\/GLator.lib and object x64\Release\/GLator.exp
   GLator.vcxproj -> I:\Adobe.After.Effects.CC.16.0.0.235.x64.Portable\After.Effects.16\App\Ae\Plug-ins\GLator.aex
