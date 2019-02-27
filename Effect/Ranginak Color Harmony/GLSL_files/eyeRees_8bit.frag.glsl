@@ -132,6 +132,6 @@ void main(){
 	vec3 a2 = a1 * factor + color3;
 	vec3 a3 = a2 * factor + color4;
 
-    colourOut = vec4(sub_1_1_color.g);
+    colourOut = factor_1_1_color;
 	
 }

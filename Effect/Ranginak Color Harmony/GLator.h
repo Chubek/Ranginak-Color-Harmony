@@ -60,8 +60,6 @@ typedef unsigned short PixelType;
 
 #include "GLator_Strings.h"
 
-#include <random>
-#include <ctime>
 
 
 
@@ -205,7 +203,9 @@ inline u_char AlphaLookup(u_int16 inValSu, u_int16 inMaxSu)
 	return static_cast<u_char>(normValFp*normValFp*0.8f * 255);
 }
 
+
 //error checking macro
 #define CHECK(err) {PF_Err err1 = err; if (err1 != PF_Err_NONE ){ throw PF_Err(err1);}}
+
 
 #endif // GLATOR_H

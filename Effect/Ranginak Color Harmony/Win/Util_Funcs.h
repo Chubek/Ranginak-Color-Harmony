@@ -47,15 +47,19 @@ namespace ColorUtils
 		return (hue > 360) ? hue - 360 : hue;
 	}
 
-	float SLClamp(float value)
+	float SLClamp(float value, float given_s)
 	{
+		float return_value = 0;
 
-		value = (value > 0.8) ? value = 0.8 : value;
-		value = (value < 0.01) ? value = 0.01 : value;
+		if (value <= 0) { return_value = given_s + 0.1; }
+		else if (value >= 1) { return_value = 1.0; }
+	
 
-		return value;
+
+		return return_value;
 
 	}
+
 
 	color_RGB HSL2RGB(color_HSL color)
 	{
@@ -88,7 +92,7 @@ namespace ColorUtils
 
 		float delta = max - min;
 
-		float H = 0, S = 0, L = (min + max) / 2;
+		float H = 0, S = 0, L = ((min + max) / 2);
 
 		if (L > 0 && L < 0.5)
 		{
@@ -102,11 +106,11 @@ namespace ColorUtils
 		if (delta > 0)
 		{
 
-			if (max == color.R && max == color.G) { H += (color.G - color.B) / delta; }
-			if (max == color.G && max == color.B) { H += 2 + (color.B - color.R) / delta; }
-			if (max == color.R && max == color.G) { H += 4 + (color.R - color.G) / delta; }
+			if (max == color.R && max != color.G) { H += (color.G - color.B) / delta; }
+			if (max == color.G && max != color.B) { H += 2 + (color.B - color.R) / delta; }
+			if (max == color.R && max != color.R) { H += 4 + (color.R - color.G) / delta; }
 
-			H /= 6;
+			H = H / 6;
 		}
 
 		if (H < 0) { H += 1; };
@@ -158,22 +162,22 @@ namespace ColorUtils
 
 	color_HSL DesaturateTo(color_HSL color, float saturation)
 	{
-		return { color.H, SLClamp(saturation), color.L };
+		return { color.H, SLClamp(saturation, color.S), color.L };
 	}
 
 	color_HSL DesaturateBy(color_HSL color, float factor)
 	{
-		return { color.H, SLClamp(color.S * factor), color.L };
+		return { color.H, SLClamp(color.S * factor, color.S), color.L };
 	}
 
 	color_HSL LightenTo(color_HSL color, float lightness)
 	{
-		return { color.H, color.S, SLClamp(lightness) };
+		return { color.H, color.S, SLClamp(lightness, color.S) };
 	}
 
 	color_HSL LightenBy(color_HSL color, float factor)
 	{
-		return { color.H, color.S, SLClamp(color.L * factor) };
+		return { color.H, color.S, SLClamp(color.L * factor, color.S) };
 	}
 
 	color_HSL ShadeTo(color_HSL color, float i)

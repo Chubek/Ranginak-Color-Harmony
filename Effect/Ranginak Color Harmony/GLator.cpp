@@ -64,6 +64,10 @@ namespace {
 	std::map<int, std::shared_ptr<AESDK_OpenGL::AESDK_OpenGL_EffectRenderData> > S_render_contexts;
 	std::recursive_mutex S_mutex;
 
+
+	void GenerateRGBMap(A_long state, std::vector<PF_FpLong> sliders, std::map<std::string, ColorUtils::color_RGB> &map, ColorUtils::color_HSL main_color);
+
+
 	AESDK_OpenGL::AESDK_OpenGL_EffectCommonDataPtr S_GLator_EffectCommonData; //global context
 	std::string S_ResourcePath;
 
@@ -289,6 +293,398 @@ namespace {
 		}
 	}
 
+	void GenerateRGBMap(A_long state, std::vector<PF_FpLong> sliders, std::map<std::string, ColorUtils::color_RGB> &map, ColorUtils::color_HSL main_color)
+	{
+		bool Monochromatic_Shade = (state == 1);
+		bool Complementary = (state == 2);
+		bool Analogous = (state == 3);
+		bool Triadic = (state == 4);
+		bool Split_Complementary = (state == 5);
+		bool Rectangle = (state == 6);
+		bool Square = (state == 7);
+
+		PF_FpLong shade_1_val = sliders[0] / 1000000.f;
+		PF_FpLong tint_1_val = sliders[1] * 1000000.f;
+		PF_FpLong tone_1_val = sliders[2] * 1000000.f;
+		PF_FpLong sat_1_val = sliders[3] / 1000000.f;
+		PF_FpLong shade_2_val = sliders[4] / 1000000.f;
+		PF_FpLong tint_2_val = sliders[5] * 1000000.f;
+		PF_FpLong tone_2_val = sliders[6] * 1000000.f;
+		PF_FpLong sat_2_val = sliders[7] / 1000000.f;
+
+		if (Monochromatic_Shade)
+		{
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = main_color;
+			ColorUtils::color_HSL complentary_3 = main_color;
+			ColorUtils::color_HSL complentary_4 = main_color;
+
+
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+
+		}
+		else if (Complementary)
+		{
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = ColorUtils::Complementary(main_color);
+			ColorUtils::color_HSL complentary_3 = ColorUtils::Complementary(main_color);
+			ColorUtils::color_HSL complentary_4 = main_color;
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+
+		}
+		else if (Analogous)
+		{
+
+			std::vector<ColorUtils::color_HSL> analogous_colors = ColorUtils::Analogous(main_color, 30);
+
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = analogous_colors[1];
+			ColorUtils::color_HSL complentary_3 = analogous_colors[1];
+			ColorUtils::color_HSL complentary_4 = analogous_colors[0];
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+
+		}
+		else if (Triadic)
+		{
+
+			std::vector<ColorUtils::color_HSL> triadic_colors = ColorUtils::Triadic(main_color);
+
+
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = triadic_colors[1];
+			ColorUtils::color_HSL complentary_3 = triadic_colors[1];
+			ColorUtils::color_HSL complentary_4 = triadic_colors[0];
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+
+		}
+		else if (Split_Complementary)
+		{
+
+			std::vector<ColorUtils::color_HSL> split_comp_colors = ColorUtils::SplitComplementary(main_color, 150);
+
+
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = split_comp_colors[1];
+			ColorUtils::color_HSL complentary_3 = split_comp_colors[1];
+			ColorUtils::color_HSL complentary_4 = split_comp_colors[0];
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+		}
+		else if (Rectangle)
+		{
+
+			std::vector<ColorUtils::color_HSL> rectangle_colors = ColorUtils::Rectangle(main_color);
+
+
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = rectangle_colors[0];
+			ColorUtils::color_HSL complentary_3 = rectangle_colors[1];
+			ColorUtils::color_HSL complentary_4 = rectangle_colors[2];
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+		}
+		else if (Square)
+		{
+
+			std::vector<ColorUtils::color_HSL> square_colors = ColorUtils::Square(main_color);
+
+
+			ColorUtils::color_HSL complentary_1 = main_color;
+			ColorUtils::color_HSL complentary_2 = square_colors[0];
+			ColorUtils::color_HSL complentary_3 = square_colors[1];
+			ColorUtils::color_HSL complentary_4 = square_colors[2];
+
+			ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
+
+
+			ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
+			ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
+			ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
+			ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
+
+			ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
+			ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
+			ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
+			ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
+
+
+			map["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
+			map["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
+			map["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
+			map["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
+			map["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
+			map["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
+			map["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
+			map["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
+			map["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
+			map["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
+			map["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
+			map["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
+			map["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
+			map["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
+			map["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
+			map["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
+			map["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
+			map["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
+			map["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
+			map["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
+
+		}
+	}
 
 	void SwizzleGL(const AESDK_OpenGL::AESDK_OpenGL_EffectRenderDataPtr& renderContext,
 		A_long widthL, A_long heightL,
@@ -1028,14 +1424,14 @@ SmartRender(
 		//sliderVal = slider_param.u.fd.value / 100.0f;
 		popup_val = popup_param.u.pd.value;
 		ERR(suites.ColorParamSuite1()->PF_GetFloatingPointColorFromColorDef(in_data->effect_ref, &color_defP, &color_val));
-		shade_1_val = shade_1_param.u.fs_d.value/ 10.0f;
-		tint_1_val = tint_1_param.u.fs_d.value/ 10.0f;
-		tone_1_val = tone_1_param.u.fs_d.value / 10.0f;
-		sat_1_val = sat_1_param.u.fs_d.value / 10.0f;
-		shade_2_val = shade_2_param.u.fs_d.value / 100.0f;
-		tint_2_val = tint_2_param.u.fs_d.value / 100.0f;
-		tone_2_val = tone_2_param.u.fs_d.value / 100.0f;
-		sat_2_val = sat_2_param.u.fs_d.value / 100.0f;
+		shade_1_val = shade_1_param.u.fs_d.value;
+		tint_1_val = tint_1_param.u.fs_d.value;
+		tone_1_val = tone_1_param.u.fs_d.value;
+		sat_1_val = sat_1_param.u.fs_d.value;
+		shade_2_val = shade_2_param.u.fs_d.value;
+		tint_2_val = tint_2_param.u.fs_d.value;
+		tone_2_val = tone_2_param.u.fs_d.value;
+		sat_2_val = sat_2_param.u.fs_d.value;
 		angle_val = angle_param.u.ad.value;
 		factor_val = factor_param.u.fs_d.value / 100.0f;
 	}
@@ -1058,13 +1454,7 @@ SmartRender(
 	SliderPlusAngle_Params["Blend Factor"] = factor_val;
 
 
-	bool Monochromatic_Shade = (popup_val == 1);
-	bool Complementary = (popup_val == 2);
-	bool Analogous = (popup_val == 3);
-	bool Triadic = (popup_val == 4);
-	bool Split_Complementary = (popup_val == 5);
-	bool Rectangle = (popup_val == 6);
-	bool Square = (popup_val == 7);
+	std::vector<PF_FpLong> sliders = { shade_1_val, tint_1_val, tone_1_val, sat_1_val, shade_2_val, tint_2_val, tone_2_val, sat_2_val };
 
 	ERR((extra->cb->checkout_layer_pixels(in_data->effect_ref, GLATOR_INPUT, &input_worldP)));
 
@@ -1124,378 +1514,7 @@ SmartRender(
 			// - simply blend the texture inside the frame buffer
 			// - TODO: hack your own shader there
 
-			if (Monochromatic_Shade)
-			{
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_3 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_4 = HSL_Colors["Main Color"];
-
-
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-
-			}
-			if (Complementary)
-			{
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = ColorUtils::Complementary(HSL_Colors["Main Color"]);
-				ColorUtils::color_HSL complentary_3 = ColorUtils::Complementary(HSL_Colors["Main Color"]);
-				ColorUtils::color_HSL complentary_4 = HSL_Colors["Main Color"];
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-
-			}
-			if (Analogous)
-			{
-
-				std::vector<ColorUtils::color_HSL> analogous_colors = ColorUtils::Analogous(HSL_Colors["Main Color"], 30);
-
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = analogous_colors[1];
-				ColorUtils::color_HSL complentary_3 = analogous_colors[1];
-				ColorUtils::color_HSL complentary_4 = analogous_colors[0];
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-
-			}
-			if (Triadic)
-			{
-
-				std::vector<ColorUtils::color_HSL> triadic_colors = ColorUtils::Triadic(HSL_Colors["Main Color"]);
-
-
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = triadic_colors[1];
-				ColorUtils::color_HSL complentary_3 = triadic_colors[1];
-				ColorUtils::color_HSL complentary_4 = triadic_colors[0];
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-
-			}
-			if (Split_Complementary)
-			{
-
-				std::vector<ColorUtils::color_HSL> split_comp_colors = ColorUtils::SplitComplementary(HSL_Colors["Main Color"], 150);
-
-
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = split_comp_colors[1];
-				ColorUtils::color_HSL complentary_3 = split_comp_colors[1];
-				ColorUtils::color_HSL complentary_4 = split_comp_colors[0];
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-			}
-			if (Rectangle)
-			{
-
-				std::vector<ColorUtils::color_HSL> rectangle_colors = ColorUtils::Rectangle(HSL_Colors["Main Color"]);
-
-
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = rectangle_colors[0];
-				ColorUtils::color_HSL complentary_3 = rectangle_colors[1];
-				ColorUtils::color_HSL complentary_4 = rectangle_colors[2];
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-			}
-			if (Square)
-			{
-
-				std::vector<ColorUtils::color_HSL> square_colors = ColorUtils::Square(HSL_Colors["Main Color"]);
-
-
-				ColorUtils::color_HSL complentary_1 = HSL_Colors["Main Color"];
-				ColorUtils::color_HSL complentary_2 = square_colors[0];
-				ColorUtils::color_HSL complentary_3 = square_colors[1];
-				ColorUtils::color_HSL complentary_4 = square_colors[2];
-
-				ColorUtils::color_HSL factorized_shade_1 = ColorUtils::ShadeBy(complentary_1, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_1 = ColorUtils::TintBy(complentary_1, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_1 = ColorUtils::ToneBy(complentary_1, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_1 = ColorUtils::SaturateBy(complentary_1, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_1 = ColorUtils::ShadeTo(complentary_2, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_1 = ColorUtils::TintTo(complentary_2, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_1 = ColorUtils::ToneTo(complentary_2, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_1 = ColorUtils::SaturateTo(complentary_2, sat_2_val);
-
-
-				ColorUtils::color_HSL factorized_shade_2 = ColorUtils::ShadeBy(complentary_3, shade_1_val);
-				ColorUtils::color_HSL factorized_tint_2 = ColorUtils::TintBy(complentary_3, tint_1_val);
-				ColorUtils::color_HSL factorized_tone_2 = ColorUtils::ToneBy(complentary_3, tone_1_val);
-				ColorUtils::color_HSL factorized_sat_2 = ColorUtils::SaturateBy(complentary_3, sat_1_val);
-
-				ColorUtils::color_HSL substitute_shade_2 = ColorUtils::ShadeTo(complentary_4, shade_2_val);
-				ColorUtils::color_HSL substitute_tint_2 = ColorUtils::TintTo(complentary_4, tint_2_val);
-				ColorUtils::color_HSL substitute_tone_2 = ColorUtils::ToneTo(complentary_4, tone_2_val);
-				ColorUtils::color_HSL substitute_sat_2 = ColorUtils::SaturateTo(complentary_4, sat_2_val);
-
-
-				RGB_Colors["Comp_1"] = ColorUtils::HSL2RGB(complentary_1);
-				RGB_Colors["Fac_1_1"] = ColorUtils::HSL2RGB(factorized_shade_1);
-				RGB_Colors["Fac_1_2"] = ColorUtils::HSL2RGB(factorized_tint_1);
-				RGB_Colors["Fac_1_3"] = ColorUtils::HSL2RGB(factorized_tone_1);
-				RGB_Colors["Fac_1_4"] = ColorUtils::HSL2RGB(factorized_sat_1);
-				RGB_Colors["Comp_2"] = ColorUtils::HSL2RGB(complentary_2);
-				RGB_Colors["Sub_1_1"] = ColorUtils::HSL2RGB(substitute_shade_1);
-				RGB_Colors["Sub_1_2"] = ColorUtils::HSL2RGB(substitute_tint_1);
-				RGB_Colors["Sub_1_3"] = ColorUtils::HSL2RGB(substitute_tone_1);
-				RGB_Colors["Sub_1_4"] = ColorUtils::HSL2RGB(substitute_sat_1);
-				RGB_Colors["Comp_3"] = ColorUtils::HSL2RGB(complentary_3);
-				RGB_Colors["Fac_2_1"] = ColorUtils::HSL2RGB(factorized_shade_2);
-				RGB_Colors["Fac_2_2"] = ColorUtils::HSL2RGB(factorized_tint_2);
-				RGB_Colors["Fac_2_3"] = ColorUtils::HSL2RGB(factorized_tone_2);
-				RGB_Colors["Fac_2_4"] = ColorUtils::HSL2RGB(factorized_sat_2);
-				RGB_Colors["Comp_4"] = ColorUtils::HSL2RGB(complentary_4);
-				RGB_Colors["Sub_2_1"] = ColorUtils::HSL2RGB(substitute_shade_2);
-				RGB_Colors["Sub_2_2"] = ColorUtils::HSL2RGB(substitute_tint_2);
-				RGB_Colors["Sub_2_3"] = ColorUtils::HSL2RGB(substitute_tone_2);
-				RGB_Colors["Sub_2_4"] = ColorUtils::HSL2RGB(substitute_sat_2);
-
-			}
+			GenerateRGBMap(popup_val, sliders, RGB_Colors, HSL_Colors["Main Color"]);
 
 			RenderGL(renderContext, widthL, heightL, inputFrameTexture, RGB_Colors, SliderPlusAngle_Params, multiplier16bit);
 
